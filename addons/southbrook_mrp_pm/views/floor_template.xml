@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  M16 (Manufacturing PM JTBD 2026-06-01) — Floor Manager portal
+  templates.
+
+  Two templates:
+
+    portal_floor_index       Landing — list of work centers with
+                              their in-flight work-order count
+                              and a 'View Queue' link.
+
+    portal_floor_workcenter  Per-station — three sections:
+                              1. Station header (code, name, OEE
+                                  target).
+                              2. Work-order queue grouped by parent
+                                  MO. Each row shows op name, state,
+                                  expected cycle time.
+                              3. Equipment at this station with the
+                                  M13 condition pill.
+
+  Phase-2 commit splices the start/finish + condition-pill action
+  buttons into these templates.
+-->
+<odoo>
+  <data>
+
+    <template id="portal_floor_index"
+              name="Southbrook Floor — Workcenter index">
+      <t t-call="portal.portal_layout">
+        <t t-set="breadcrumbs_searchbar" t-value="True"/>
+        <t t-set="page_name" t-value="'southbrook_floor'"/>
+        <t t-set="title">Floor — Work Centers</t>
+        <!-- 30-second auto-refresh so queue counts stay current on
+             the operator's tablet without manual reload. -->
+        <t t-set="head">
+          <meta http-equiv="refresh" content="30"/>
+        </t>
+
+        <div class="o_sb_floor o_sb_floor_index">
+          <header class="o_sb_floor_header">
+            <h1>Shop Floor — Work Centers</h1>
+            <p>
+              Pick your station to see its current work-order queue.
+            </p>
+          </header>
+
+          <ul class="o_sb_floor_wc_grid">
+            <li t-foreach="wc_rows" t-as="row"
+                class="o_sb_floor_wc_tile"
+                t-att-class="'o_sb_floor_wc_inflight' if row['inflight'] else ''">
+              <a t-attf-href="/my/southbrook/floor/{{row['id']}}"
+                 class="o_sb_floor_wc_link">
+                <div class="o_sb_floor_wc_code"
+                     t-esc="row['code']"/>
+                <div class="o_sb_floor_wc_name"
+                     t-esc="row['name']"/>
+                <div class="o_sb_floor_wc_count">
+                  <t t-if="row['inflight']">
+                    <span class="o_sb_floor_wc_count_num"
+                          t-esc="row['inflight']"/>
+                    <span class="o_sb_floor_wc_count_lbl">in queue</span>
+                  </t>
+                  <t t-else="">
+                    <span class="o_sb_floor_wc_count_empty">— idle —</span>
+                  </t>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </t>
+    </template>
+
+    <template id="portal_floor_workcenter"
+              name="Southbrook Floor — Per-station queue">
+      <t t-call="portal.portal_layout">
+        <t t-set="page_name" t-value="'southbrook_floor_wc'"/>
+        <t t-set="title"><t t-esc="wc['code']"/> · Queue</t>
+        <!-- 30-second auto-refresh. The browser's refresh timer is
+             reset by any link/form click so the operator isn't
+             interrupted mid-interaction; after a start/finish POST
+             the redirect re-arms the timer for the new page. -->
+        <t t-set="head">
+          <meta http-equiv="refresh" content="30"/>
+        </t>
+
+        <div class="o_sb_floor o_sb_floor_wc">
+          <header class="o_sb_floor_header">
+            <p class="o_sb_floor_breadcrumb">
+              <a href="/my/southbrook/floor">← All Stations</a>
+            </p>
+            <h1>
+              <span class="o_sb_floor_wc_h_code"
+                    t-esc="wc['code']"/>
+              <span class="o_sb_floor_wc_h_name"
+                    t-esc="wc['name']"/>
+            </h1>
+            <p class="o_sb_floor_meta">
+              OEE Target <strong t-esc="wc['oee_target']"/>%
+            </p>
+          </header>
+
+          <!-- WORK-ORDER QUEUE -->
+          <section class="o_sb_floor_queue">
+            <h2>Queue</h2>
+            <t t-if="not wo_groups">
+              <p class="o_sb_floor_empty">No work orders queued at this station.</p>
+            </t>
+            <t t-else="">
+              <t t-foreach="wo_groups" t-as="grp">
+                <div class="o_sb_floor_mo_card">
+                  <header class="o_sb_floor_mo_header">
+                    <strong t-esc="grp['mo_name']"/>
+                    <span class="o_sb_floor_mo_sku mono"
+                          t-esc="grp['product_sku']"/>
+                    <span class="o_sb_floor_mo_state"
+                          t-esc="grp['mo_state']"/>
+                    <span t-if="grp['deadline']"
+                          class="o_sb_floor_mo_deadline">
+                      Due <t t-esc="grp['deadline']"/>
+                    </span>
+                  </header>
+                  <ul class="o_sb_floor_wo_list">
+                    <li t-foreach="grp['wos']" t-as="wo"
+                        class="o_sb_floor_wo"
+                        t-att-class="'o_sb_floor_wo_' + wo['state']">
+                      <div class="o_sb_floor_wo_label">
+                        <strong t-esc="wo['name']"/>
+                      </div>
+                      <div class="o_sb_floor_wo_state mono"
+                           t-esc="wo['state']"/>
+                      <div class="o_sb_floor_wo_time mono">
+                        <t t-esc="wo['duration_expected']"/> min
+                      </div>
+                      <!-- M16 Phase-2 — start / finish form-POSTs. -->
+                      <div class="o_sb_floor_wo_actions">
+                        <t t-if="wo['state'] in ('pending','ready')">
+                          <form method="post"
+                                t-attf-action="/my/southbrook/floor/wo/{{wo['id']}}/start"
+                                class="o_sb_floor_wo_form">
+                            <input type="hidden" name="csrf_token"
+                                   t-att-value="request.csrf_token()"/>
+                            <button type="submit"
+                                    class="o_sb_floor_wo_btn o_sb_floor_wo_start">
+                              ▶ Start
+                            </button>
+                          </form>
+                        </t>
+                        <t t-elif="wo['state'] == 'progress'">
+                          <form method="post"
+                                t-attf-action="/my/southbrook/floor/wo/{{wo['id']}}/finish"
+                                class="o_sb_floor_wo_form">
+                            <input type="hidden" name="csrf_token"
+                                   t-att-value="request.csrf_token()"/>
+                            <button type="submit"
+                                    class="o_sb_floor_wo_btn o_sb_floor_wo_finish">
+                              ✓ Finish
+                            </button>
+                          </form>
+                        </t>
+                        <t t-else="">
+                          <span class="o_sb_floor_wo_btn o_sb_floor_wo_blocked">
+                            ─ blocked
+                          </span>
+                        </t>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </t>
+            </t>
+          </section>
+
+          <!-- EQUIPMENT AT THIS STATION -->
+          <section class="o_sb_floor_equipment" t-if="equipment">
+            <h2>Equipment at this Station</h2>
+            <ul class="o_sb_floor_eq_list">
+              <li t-foreach="equipment" t-as="eq"
+                  class="o_sb_floor_eq"
+                  t-att-class="'o_sb_floor_eq_' + eq['condition']">
+                <span class="o_sb_floor_eq_name"
+                      t-esc="eq['name']"/>
+                <!-- M16 Phase-2 — condition pill becomes an
+                     auto-submitting select. Picking a value POSTs
+                     to /equipment/<id>/condition which writes back
+                     to maintenance.equipment.southbrook_condition
+                     (M13 field) and redirects here. -->
+                <form method="post"
+                      t-attf-action="/my/southbrook/floor/equipment/{{eq['id']}}/condition"
+                      class="o_sb_floor_eq_form">
+                  <input type="hidden" name="csrf_token"
+                         t-att-value="request.csrf_token()"/>
+                  <select name="condition"
+                          class="o_sb_floor_eq_pill_select mono"
+                          onchange="this.form.submit()">
+                    <option value="good"
+                            t-att-selected="eq['condition'] == 'good' or None">good</option>
+                    <option value="fair"
+                            t-att-selected="eq['condition'] == 'fair' or None">fair</option>
+                    <option value="watch"
+                            t-att-selected="eq['condition'] == 'watch' or None">watch</option>
+                    <option value="critical"
+                            t-att-selected="eq['condition'] == 'critical' or None">critical</option>
+                    <option value="offline"
+                            t-att-selected="eq['condition'] == 'offline' or None">offline</option>
+                  </select>
+                </form>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </t>
+    </template>
+
+    <!-- ================================================================
+         M12 — kiosk display mode template. Full-screen dark theme,
+         no portal chrome (no t-call="portal.portal_layout"). Just
+         <html> + <body> + the kiosk grid. 30s auto-refresh.
+         ================================================================ -->
+    <template id="portal_floor_kiosk"
+              name="Southbrook Floor — Kiosk (factory TV)">
+      <html lang="en">
+        <head>
+          <title>Southbrook Floor — Kiosk</title>
+          <meta charset="utf-8"/>
+          <meta http-equiv="refresh" content="30"/>
+          <link rel="stylesheet"
+                type="text/css"
+                href="/southbrook_mrp_pm/static/src/css/kiosk.css"/>
+        </head>
+        <body class="o_sb_kiosk_body">
+          <div class="o_sb_kiosk">
+
+            <header class="o_sb_kiosk_header">
+              <div class="o_sb_kiosk_h_left">
+                <span class="o_sb_kiosk_brand">SOUTHBROOK</span>
+                <span class="o_sb_kiosk_subbrand">Shop Floor — Live</span>
+              </div>
+              <div class="o_sb_kiosk_h_right">
+                <span class="o_sb_kiosk_clock"
+                      t-esc="now.strftime('%H:%M · %a %b %d')"/>
+                <span class="o_sb_kiosk_late_badge"
+                      t-att-class="'o_sb_kiosk_late_badge_warn' if total_late else 'o_sb_kiosk_late_badge_calm'">
+                  LATE
+                  <strong t-esc="total_late"/>
+                </span>
+              </div>
+            </header>
+
+            <!-- WORKCENTER GRID -->
+            <section class="o_sb_kiosk_section">
+              <h2 class="o_sb_kiosk_h2">Stations</h2>
+              <div class="o_sb_kiosk_grid">
+                <div t-foreach="wc_rows" t-as="row"
+                     class="o_sb_kiosk_card"
+                     t-att-class="'o_sb_kiosk_card_alerts' if row['alerts'] else ('o_sb_kiosk_card_busy' if row['inflight'] else '')">
+                  <div class="o_sb_kiosk_card_code"
+                       t-esc="row['code']"/>
+                  <div class="o_sb_kiosk_card_name"
+                       t-esc="row['name']"/>
+                  <div class="o_sb_kiosk_card_metrics">
+                    <div class="o_sb_kiosk_metric">
+                      <div class="o_sb_kiosk_metric_v"
+                           t-esc="row['inflight']"/>
+                      <div class="o_sb_kiosk_metric_l">queue</div>
+                    </div>
+                    <div class="o_sb_kiosk_metric">
+                      <div class="o_sb_kiosk_metric_v o_sb_kiosk_metric_done"
+                           t-esc="row['done_today']"/>
+                      <div class="o_sb_kiosk_metric_l">today</div>
+                    </div>
+                    <div class="o_sb_kiosk_metric">
+                      <div class="o_sb_kiosk_metric_v o_sb_kiosk_metric_late"
+                           t-esc="row['late']"/>
+                      <div class="o_sb_kiosk_metric_l">late</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- FAMILY ROW -->
+            <section class="o_sb_kiosk_section">
+              <h2 class="o_sb_kiosk_h2">Families</h2>
+              <div class="o_sb_kiosk_fam_row">
+                <div t-foreach="family_rows" t-as="fam"
+                     class="o_sb_kiosk_fam"
+                     t-att-class="'o_sb_kiosk_fam_busy' if fam['inflight'] else ''">
+                  <div class="o_sb_kiosk_fam_name"
+                       t-esc="fam['name']"/>
+                  <div class="o_sb_kiosk_fam_metrics">
+                    <span class="o_sb_kiosk_fam_inflight"
+                          t-esc="fam['inflight']"/>
+                    <span class="o_sb_kiosk_fam_sep">·</span>
+                    <span class="o_sb_kiosk_fam_done"
+                          t-esc="fam['done_today']"/>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </body>
+      </html>
+    </template>
+
+  </data>
+</odoo>
