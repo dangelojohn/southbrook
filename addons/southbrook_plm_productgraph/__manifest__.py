@@ -53,6 +53,11 @@ License: LGPL-3.0 (same as both parents).
         "product_graph_release",
     ],
     "data": [
+        # noupdate=1 data — bumps base.group_user.api_key_duration to 5y
+        # so the MCP service account can mint long-lived keys without
+        # group elevation. Load before any view that might be inspected
+        # by admin-settings prefetch on first install.
+        "data/api_key_policy.xml",
         "views/southbrook_eco_views.xml",
     ],
     "application": False,
