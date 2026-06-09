@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Order Builder views — Brief section 2.2 + Build Spec section 7
+  Visual reference: docs/southbrook_internal_order_builder.html (mock).
+
+  Translation discipline (per John's commit 9 guidance): the mock is the
+  information architecture reference, not the pixel-perfect target. Odoo's
+  view primitives (form/sheet/notebook/group/header) own the layout; the
+  walnut-on-linen aesthetic layers via SCSS in commit 9.5 or Phase 2 polish.
+
+  Inheritance approach: extend the standard sale.order form. This gives
+  us all the existing patterns (line tree, partner picker, pricelist field,
+  state pipeline) for free; we xpath additions for southbrook-specific bits.
+-->
+<odoo>
+
+  <!-- ============================================================== -->
+  <!-- Order Builder form (extends sale.order) -->
+  <!-- ============================================================== -->
+  <record id="view_order_form_southbrook" model="ir.ui.view">
+    <field name="name">sale.order.form.southbrook</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+
+      <!-- (1) Seed-mode banner — visible only when seed_mode='illustrative'.
+           Per OQ2 acked + commit-9 ask: discreet visual reminder for
+           Phase-1 gate review so demo numbers don't get mistaken for
+           production data. Hides automatically when mode flips to canonical. -->
+      <xpath expr="//sheet" position="before">
+        <div class="alert alert-warning text-center"
+             role="alert"
+             style="margin: 0; border-radius: 0;"
+             invisible="context.get('seed_mode_canonical', False)">
+          <strong>ILLUSTRATIVE SEED</strong> — demo numbers; not production data.
+          See PUNCHLIST OQ2 + Build Spec section 9.3.
+        </div>
+      </xpath>
+
+      <!-- (2) Header strip: 5 cells (mock header strip). Append after
+           the partner block. Channel + savings come from southbrook fields. -->
+      <xpath expr="//field[@name='partner_id']" position="after">
+        <field name="parent_order_id" readonly="1"
+               invisible="not parent_order_id"/>
+        <field name="version" readonly="1"
+               groups="base.group_no_one"/>
+      </xpath>
+
+      <!-- (3) "Duplicate as Draft" button — NF6 Image Floor pattern.
+           Lives in the button_box near the top of the form. -->
+      <xpath expr="//div[@name='button_box']" position="inside">
+        <button name="action_duplicate_as_draft"
+                type="object"
+                string="Duplicate as Draft"
+                class="oe_stat_button"
+                icon="fa-copy"
+                groups="sales_team.group_sale_salesman"
+                help="Create a v+1 draft copy of this order with all lines
+                      preserved. NF6 — Image Floor iterative-design flow."/>
+      </xpath>
+
+      <!-- (4) Per-line zone field — Q21 + NF9 (Richwood multi-zone pattern).
+           Adds the zone column to the order_line tree + a zone_label field
+           that's only visible when zone='other'. -->
+      <xpath expr="//field[@name='order_line']/list/field[@name='product_id']" position="before">
+        <field name="zone" optional="show"/>
+        <field name="zone_label"
+               optional="hide"
+               invisible="zone != 'other'"/>
+      </xpath>
+
+      <!-- (5) Multi-zone visual grouping — Q21 + NF9 (Richwood).
+           Per Q21 acked deliverable: <group expand="1" string="Zone"> pattern.
+           Implemented via default_group_by="zone" on the embedded order_line
+           tree so lines display as collapsible zone-headed groups with
+           auto-aggregated price_subtotal per zone. Mock §3.D faithful:
+           zone-headed groups, per-zone subtotals visible at all times. -->
+      <xpath expr="//field[@name='order_line']/list" position="attributes">
+        <attribute name="default_group_by">zone</attribute>
+        <attribute name="expand">1</attribute>
+      </xpath>
+
+      <!-- (6) Ensure price_subtotal is aggregable (sum) for the zone group
+           headers. Odoo auto-aggregates monetary fields when a group_by is
+           active, but flagging sum explicitly defends against a future Odoo
+           upgrade that tightens aggregation defaults. -->
+      <xpath expr="//field[@name='order_line']/list/field[@name='price_subtotal']" position="attributes">
+        <attribute name="sum">Zone Subtotal</attribute>
+      </xpath>
+
+      <!-- (5) 3D Kitchen Preview tab — Track 1 commit 6.
+           Mounts the kitchen_viewport widget. Reads order_line from
+           the record and calls sale.order.get_kitchen_3d_payload to
+           layout every line's cabinet along the X axis with zone-
+           specific Y floor (wall cabinets float at 1400mm, base/
+           tall/etc. at floor level). Same OWL component as the
+           configurator wizard's cabinet_viewport — dispatches by
+           record.resModel internally. -->
+      <xpath expr="//notebook" position="inside">
+        <page name="kitchen_3d_preview" string="3D Kitchen Preview">
+          <div style="height: 520px; margin: -8px 0;">
+            <widget name="kitchen_viewport"/>
+          </div>
+        </page>
+      </xpath>
+
+    </field>
+  </record>
+
+  <!-- ============================================================== -->
+  <!-- Order Builder action (under Sales menu) -->
+  <!-- ============================================================== -->
+  <record id="action_order_builder" model="ir.actions.act_window">
+    <field name="name">Order Builder</field>
+    <field name="res_model">sale.order</field>
+    <field name="view_mode">list,form</field>
+    <field name="context">{'default_state': 'draft'}</field>
+    <field name="domain">[('state', 'in', ('draft', 'sent'))]</field>
+    <field name="help" type="html">
+      <p class="o_view_nocontent_smiling_face">
+        Build a quote with the Order Builder
+      </p>
+      <p>
+        The Order Builder is the sales-rep-facing flow for Southbrook
+        kitchen orders. Pick a customer, add cabinet lines, configure
+        each one inline. Lines are grouped by zone (base run / wall /
+        tall / island / accessory).
+      </p>
+      <p>
+        Reference: <code>docs/Southbrook_ImageFloor_Case_Study.md</code> for
+        the four operating patterns this builder accommodates.
+      </p>
+    </field>
+  </record>
+
+  <!-- ============================================================== -->
+  <!-- Menus                                                          -->
+  <!--                                                                -->
+  <!-- NF23 (caught at live install on QNAP southbrook stack          -->
+  <!-- 2026-05-30): User reported "no southbrook_estimating pulldown  -->
+  <!-- in the main pulldown menu". Root cause: the original Phase-1   -->
+  <!-- menu lived ONLY under Sales → Orders → Order Builder (per      -->
+  <!-- Build Spec §2.2 placement) — Odoo never rendered a top-level   -->
+  <!-- entry for the addon in the main app drawer.                    -->
+  <!-- Fix: add menu_southbrook_root as a TOP-LEVEL menuitem (no      -->
+  <!-- parent attribute) carrying web_icon. With no parent + web_icon -->
+  <!-- set, Odoo treats it as an installable application root and     -->
+  <!-- renders the tile in the main app drawer alongside Sales/etc.   -->
+  <!-- The Order Builder action now appears under BOTH the new        -->
+  <!-- top-level root AND the existing Sales → Orders sub-entry —     -->
+  <!-- discoverability without losing the Build-Spec placement.       -->
+  <!-- ============================================================== -->
+
+  <!-- Top-level entry in the main app drawer. -->
+  <menuitem id="menu_southbrook_root"
+            name="Southbrook Estimating"
+            web_icon="southbrook_estimating,static/description/icon.png"
+            sequence="20"/>
+
+  <!-- Order Builder as the default landing item under the top-level root. -->
+  <menuitem id="menu_southbrook_order_builder_top"
+            name="Order Builder"
+            parent="menu_southbrook_root"
+            action="action_order_builder"
+            sequence="10"/>
+
+  <!-- Legacy placement under Sales → Orders — preserved per Build Spec §2.2. -->
+  <menuitem id="menu_southbrook_order_builder"
+            name="Order Builder"
+            parent="sale.sale_order_menu"
+            action="action_order_builder"
+            sequence="5"/>
+
+</odoo>
