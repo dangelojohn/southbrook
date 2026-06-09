@@ -1,0 +1,442 @@
+// =====================================================================
+// G1 + G2 — Southbrook homepage SCSS.
+// Uses the shared design tokens partial (--sb-walnut, --sb-linen,
+// --sb-sky, --sb-font-display, etc.).
+// =====================================================================
+
+.o_sb_home {
+  background: var(--sb-paper, #fbf7ef);
+  font-family: var(--sb-font-sans, system-ui, sans-serif);
+  color: var(--sb-ink, #1a1814);
+  line-height: 1.55;
+}
+
+// ---------------------------------------------------------------------
+// HERO
+// ---------------------------------------------------------------------
+.o_sb_hero {
+  padding: 80px 0 64px;
+  background:
+    linear-gradient(180deg,
+      var(--sb-linen, #f4ede2) 0%,
+      var(--sb-paper, #fbf7ef) 100%);
+  border-bottom: 1px solid var(--sb-rule, #d8cfbf);
+}
+
+.o_sb_hero_title {
+  font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 56px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--sb-walnut, #6b3f2a);
+  margin: 0 0 24px;
+
+  @media (max-width: 768px) {
+    font-size: 38px;
+  }
+}
+
+.o_sb_hero_accent {
+  font-style: italic;
+  font-variation-settings: "opsz" 36, "wght" 400;
+  color: var(--sb-sky, #2b4f6b);
+}
+
+.o_sb_hero_sub {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--sb-ink-dim, #6b665e);
+  max-width: 540px;
+  margin: 0 0 32px;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
+}
+
+.o_sb_hero_cta_row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin: 0 0 16px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.o_sb_hero_meta {
+  font-family: var(--sb-font-mono, 'JetBrains Mono', monospace);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sb-ink-dim, #6b665e);
+  margin: 8px 0 0;
+}
+
+// ---------------------------------------------------------------------
+// Hero aside — featured-series card
+// ---------------------------------------------------------------------
+.o_sb_hero_aside {
+  display: flex;
+  align-items: center;
+
+  @media (max-width: 991px) {
+    margin-top: 32px;
+  }
+}
+
+.o_sb_hero_card {
+  background: var(--sb-walnut, #6b3f2a);
+  color: var(--sb-linen, #f4ede2);
+  border-radius: 4px;
+  padding: 32px 28px;
+  width: 100%;
+  box-shadow: 0 12px 28px rgba(74, 60, 46, 0.18);
+}
+
+.o_sb_hero_card_label {
+  font-family: var(--sb-font-mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-walnut-l, #c89e85);
+  margin-bottom: 12px;
+}
+
+.o_sb_hero_card_title {
+  font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 28px;
+  line-height: 1.1;
+  margin: 0 0 12px;
+}
+
+.o_sb_hero_card_body {
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+  opacity: 0.9;
+}
+
+// ---------------------------------------------------------------------
+// THREE-UP FEATURES
+// ---------------------------------------------------------------------
+.o_sb_features {
+  padding: 72px 0;
+  background: var(--sb-paper, #fbf7ef);
+}
+
+.o_sb_feature {
+  text-align: center;
+  padding: 20px 12px;
+}
+
+.o_sb_feature_icon {
+  display: inline-block;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  font-size: 24px;
+  border-radius: 50%;
+  background: var(--sb-sky-l, #d8e3ec);
+  color: var(--sb-sky, #2b4f6b);
+  margin-bottom: 18px;
+}
+
+.o_sb_feature_title {
+  font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+  font-variation-settings: "opsz" 14, "wght" 600;
+  font-size: 20px;
+  color: var(--sb-walnut, #6b3f2a);
+  margin: 0 0 12px;
+}
+
+.o_sb_feature_body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--sb-ink, #1a1814);
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+// ---------------------------------------------------------------------
+// SECONDARY CTA STRIP
+// ---------------------------------------------------------------------
+.o_sb_cta_strip {
+  padding: 56px 0;
+  background: var(--sb-linen, #f4ede2);
+  border-top: 1px solid var(--sb-rule, #d8cfbf);
+}
+
+.o_sb_cta_strip_title {
+  font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 28px;
+  color: var(--sb-walnut, #6b3f2a);
+  margin: 0 0 8px;
+}
+
+.o_sb_cta_strip_sub {
+  font-size: 15px;
+  color: var(--sb-ink-dim, #6b665e);
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------
+// BUTTONS — homepage-specific so they don't conflict with Odoo's
+// .btn-primary defaults. Map to the shared sb-btn pattern.
+// ---------------------------------------------------------------------
+.o_sb_btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 4px;
+  font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 150ms ease, color 150ms ease,
+              border-color 150ms ease, transform 100ms ease;
+  text-transform: none;
+
+  &:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+}
+
+.o_sb_btn_primary {
+  background: var(--sb-walnut, #6b3f2a);
+  color: var(--sb-linen, #f4ede2);
+
+  &:hover {
+    background: var(--sb-walnut-d, #4a2b1d);
+    color: var(--sb-linen, #f4ede2);
+  }
+}
+
+.o_sb_btn_ghost {
+  background: transparent;
+  color: var(--sb-walnut, #6b3f2a);
+  border-color: var(--sb-walnut, #6b3f2a);
+
+  &:hover {
+    background: var(--sb-walnut, #6b3f2a);
+    color: var(--sb-linen, #f4ede2);
+  }
+}
+
+.o_sb_btn_lg {
+  padding: 16px 32px;
+  font-size: 16px;
+}
+
+// =====================================================================
+// G6 — Branded auth chrome for /web/login, /web/signup, /web/reset_password
+// Override of stock web.login_layout (see views/auth_template.xml).
+// Two-column layout: left walnut brand panel, right form column.
+// =====================================================================
+
+.o_sb_auth {
+  max-width: 1080px;
+  padding: 56px 16px;
+
+  @media (max-width: 991px) {
+    padding: 24px 12px;
+  }
+}
+
+.o_sb_auth_row {
+  background: var(--sb-paper, #fbf7ef);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 24px 56px rgba(74, 60, 46, 0.15);
+}
+
+// LEFT BRAND PANEL ----------------------------------------------------
+.o_sb_auth_brand {
+  background: var(--sb-walnut, #6b3f2a);
+  color: var(--sb-linen, #f4ede2);
+  padding: 64px 48px;
+  align-items: center;
+}
+
+.o_sb_auth_brand_inner {
+  max-width: 360px;
+}
+
+.o_sb_auth_mark {
+  font-family: var(--sb-font-mono, 'JetBrains Mono', monospace);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  margin-bottom: 32px;
+  color: var(--sb-walnut-l, #c89e85);
+}
+
+.o_sb_auth_brand_title {
+  font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+  font-variation-settings: "opsz" 36, "wght" 500;
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 20px;
+  color: var(--sb-linen, #f4ede2);
+}
+
+.o_sb_auth_brand_accent {
+  font-style: italic;
+  font-variation-settings: "opsz" 36, "wght" 400;
+  color: #d8c3ad;
+}
+
+.o_sb_auth_brand_sub {
+  font-size: 15px;
+  line-height: 1.55;
+  opacity: 0.9;
+  margin: 0 0 28px;
+}
+
+.o_sb_auth_brand_meta {
+  font-family: var(--sb-font-mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  margin: 0;
+}
+
+// RIGHT FORM COLUMN ---------------------------------------------------
+.o_sb_auth_form_col {
+  background: white;
+  padding: 64px 56px;
+
+  @media (max-width: 991px) {
+    padding: 36px 28px;
+  }
+}
+
+.o_sb_auth_card {
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.o_sb_auth_mobile_mark {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.o_sb_auth_mark_link {
+  font-family: var(--sb-font-mono, 'JetBrains Mono', monospace);
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  color: var(--sb-walnut, #6b3f2a);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--sb-walnut-d, #4a2b1d);
+    text-decoration: none;
+  }
+}
+
+// Form controls inside the auth card
+.o_sb_auth_card {
+  .form-label {
+    font-family: var(--sb-font-sans, system-ui, sans-serif);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: var(--sb-ink, #1a1814);
+    margin-bottom: 6px;
+  }
+
+  .form-control {
+    border: 1px solid var(--sb-rule, #d8cfbf);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 14px;
+    background: var(--sb-paper, #fbf7ef);
+    color: var(--sb-ink, #1a1814);
+    transition: border-color 150ms ease, background 150ms ease;
+
+    &:focus {
+      border-color: var(--sb-walnut, #6b3f2a);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(107, 63, 42, 0.12);
+      outline: none;
+    }
+  }
+
+  .form-text {
+    font-size: 12px;
+    color: var(--sb-ink-dim, #6b665e);
+    margin-top: 4px;
+  }
+
+  // Primary submit (Sign In / Sign Up)
+  button[type="submit"],
+  .btn-primary {
+    background: var(--sb-walnut, #6b3f2a);
+    color: var(--sb-linen, #f4ede2);
+    border: 1px solid var(--sb-walnut, #6b3f2a);
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-family: var(--sb-font-display, 'Roboto Flex', sans-serif);
+    font-weight: 500;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    width: 100%;
+    margin-top: 8px;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: var(--sb-walnut-d, #4a2b1d) !important;
+      color: var(--sb-linen, #f4ede2) !important;
+      border-color: var(--sb-walnut-d, #4a2b1d) !important;
+    }
+  }
+
+  // Secondary text links (forgot password / sign up / log in)
+  a {
+    color: var(--sb-sky, #2b4f6b);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--sb-walnut, #6b3f2a);
+      text-decoration: underline;
+    }
+  }
+
+  // Database manager / Powered by Odoo — hide for the customer
+  // experience. We left them in the DOM (we replaced only the outer
+  // container) but visually suppress so the page stays branded.
+  .o_database_list,
+  .text-center.small.mt-4 {
+    display: none !important;
+  }
+}
+
+.o_sb_auth_footer {
+  text-align: center;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--sb-rule, #d8cfbf);
+}
+
+.o_sb_auth_back {
+  font-family: var(--sb-font-mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sb-walnut, #6b3f2a) !important;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--sb-walnut-d, #4a2b1d) !important;
+    text-decoration: underline !important;
+  }
+}

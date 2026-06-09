@@ -1,0 +1,2396 @@
+// Southbrook portal — Track 2 commit 3 (2026-05-30): design tokens.
+//
+// The palette + font stacks lift directly from
+// docs/southbrook_owl_mockup.html and are scoped to the
+// .o_southbrook_owl_mount container so they don't leak into other
+// portal pages (the dealer's /my, /shop, etc. stay on their default
+// Bootstrap/Odoo styles).
+//
+// NF15 framing: this commit IS the "palette tokens → CSS vars"
+// migration the earlier code blocks promised. All subsequent OWL
+// component styling references var(--sb-*) tokens instead of
+// hex literals.
+
+.o_southbrook_owl_mount {
+    // 2026-06-01: dropped the duplicate token declarations from
+    // this scope. Canonical tokens now live in
+    // addons/southbrook_estimating/static/src/scss/_southbrook_design_tokens.scss
+    // at :root, applied globally. Single source of truth — see
+    // docs/CUSTOMER_TO_MANUFACTURING_FLOW.md §5. This scope keeps
+    // only per-mount layout properties (font-family inheritance,
+    // padding, border) + the --sb-component-tint var which is
+    // OWL-boundary specific and not promoted to :root.
+
+    --sb-component-tint: rgba(43, 79, 107, 0.04);
+
+    font-family: var(--sb-font-sans);
+    color: var(--sb-ink);
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    padding: 24px;
+    min-height: 600px;
+}
+
+// ----- Placeholder (no-JS / mount failure fallback) ----------------
+.o_southbrook_owl_placeholder {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 32px;
+    background: var(--sb-linen);
+    border: 1px solid var(--sb-rule);
+    border-radius: 4px;
+    text-align: center;
+    color: var(--sb-ink);
+    line-height: 1.55;
+
+    strong {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 12px;
+        color: var(--sb-walnut);
+    }
+
+    code {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+        background: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        padding: 1px 6px;
+        border-radius: 2px;
+        color: var(--sb-ink);
+    }
+
+    p {
+        margin: 12px 0;
+        font-size: 13px;
+    }
+}
+
+// ----- Outer header card --------------------------------------------
+// T1 placement note: this lives OUTSIDE .o_southbrook_owl_mount so the
+// portal page card uses the Odoo portal-default styling but pulls in
+// the Southbrook accent colour for consistency. Scope the rule
+// directly.
+.o_southbrook_portal_header {
+    background: #fbf7ef;
+    border: 1px solid #d8cfbf;
+    // (tokens not used here because this card lives outside the
+    //  scoping container; Phase 3 polish moves the whole portal page
+    //  under a top-level wrapper and refactors all rules to vars.)
+}
+
+// ----- T2C5 reactive-store-probe states ----------------------------
+.o_owl_loading_card,
+.o_owl_error_card,
+.o_owl_empty_card {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 24px 28px;
+    background: var(--sb-linen);
+    border: 1px solid var(--sb-rule);
+    border-radius: 4px;
+    color: var(--sb-ink);
+    line-height: 1.55;
+    text-align: center;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_error_card {
+    border-color: var(--sb-alert);
+    background: rgba(168, 58, 43, 0.06);
+
+    strong {
+        color: var(--sb-alert);
+    }
+    .o_owl_retry_btn {
+        margin-top: 14px;
+        font-family: var(--sb-font-mono);
+        font-size: 12px;
+    }
+}
+
+.o_owl_empty_card {
+    code {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+        background: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        padding: 1px 5px;
+        border-radius: 2px;
+    }
+}
+
+.o_owl_loaded {
+    // 2026-06-01: same fix as .o_southbrook_owl_root (ebc46b4) —
+    // the inner .o_owl_loaded wrapper carried its OWN 640px cap.
+    // Even after the outer frame was flexed, this inner cap was
+    // still constraining the HeaderStrip grid + titlebar to ~524px
+    // of usable width and forcing 'Demo Tradesperson (Tier 3)' onto
+    // two lines + dollar values to wrap. Removing both caps so the
+    // inner content gets the full parent width.
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 28px 28px 32px;
+    background: var(--sb-linen);
+    border: 1px solid var(--sb-rule);
+    border-radius: 4px;
+    color: var(--sb-ink);
+    line-height: 1.55;
+
+    .o_owl_heading {
+        font-family: var(--sb-font-display);
+        font-variation-settings: "opsz" 36, "wght" 500;
+        font-size: 22px;
+        color: var(--sb-walnut);
+        margin-bottom: 4px;
+        letter-spacing: -0.01em;
+    }
+
+    .o_owl_partner_inline {
+        font-size: 14px;
+        color: var(--sb-ink-dim);
+        font-weight: 400;
+    }
+
+    .o_owl_via {
+        font-size: 12px;
+        color: var(--sb-ink-dim);
+        margin-left: 4px;
+    }
+}
+
+// ----- Channel badge (used in T2C5 + HeaderStrip in T2C6) ----------
+.o_owl_channel_badge {
+    display: inline-block;
+    font-family: var(--sb-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin: 8px 0 18px;
+    color: var(--sb-linen);
+    background: var(--sb-walnut);
+
+    &.o_owl_channel_dealer       { background: var(--sb-walnut); }
+    &.o_owl_channel_tradesperson { background: var(--sb-sky); }
+    &.o_owl_channel_kd           { background: #5e7c8b; }
+    &.o_owl_channel_bigbox       { background: #6b665e; }
+    &.o_owl_channel_refacing     { background: #8a6e3f; }
+    &.o_owl_channel_retail {
+        background: var(--sb-rule-d);
+        color: var(--sb-ink);
+    }
+}
+
+// ----- T2C7 IllustrativeBanner -------------------------------------
+.o_owl_illus_banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--sb-hl);              // amber highlight
+    border: 1px solid #d4b54a;
+    border-radius: 2px;
+    padding: 8px 14px;
+    margin: 0 0 14px;
+    font-size: 12px;
+    font-family: var(--sb-font-sans);
+    color: var(--sb-ink);
+}
+
+.o_owl_illus_pill {
+    font-family: var(--sb-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    background: #b08820;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 2px;
+    white-space: nowrap;
+}
+
+.o_owl_illus_text {
+    flex: 1;
+
+    code {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0 4px;
+        border-radius: 2px;
+    }
+}
+
+// ----- T2C7 OrderTitlebar ------------------------------------------
+.o_owl_titlebar {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding: 6px 0 14px;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_titlebar_lhs {
+    flex: 1;
+}
+
+.o_owl_titlebar_crumb {
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+    margin-bottom: 4px;
+}
+
+.o_owl_back_link {
+    color: var(--sb-ink-dim);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        color: var(--sb-walnut);
+    }
+}
+
+.o_owl_titlebar_heading {
+    font-family: var(--sb-font-display);
+    font-variation-settings: "opsz" 36, "wght" 500;
+    font-size: 26px;
+    margin: 0;
+    letter-spacing: -0.015em;
+    color: var(--sb-ink);
+    line-height: 1.15;
+}
+
+.o_owl_titlebar_sub {
+    font-variation-settings: "opsz" 24, "wght" 400;
+    color: var(--sb-ink-dim);
+    margin-left: 6px;
+}
+
+.o_owl_titlebar_ref {
+    font-family: var(--sb-font-mono);
+    font-size: 12px;
+    color: var(--sb-ink-dim);
+    white-space: nowrap;
+}
+
+// T2C13 — customer-mode indicator badge in the titlebar ref column.
+.o_owl_mode_badge {
+    display: inline-block;
+    font-family: var(--sb-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    background: var(--sb-sky);
+    color: var(--sb-linen);
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-right: 8px;
+    vertical-align: 2px;
+}
+
+// ----- T2C7 StagePipeline — 5 chevron stages -----------------------
+.o_owl_stages {
+    display: flex;
+    gap: 0;
+    padding: 4px 0 16px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_stage {
+    position: relative;
+    padding: 6px 18px 6px 22px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-right: none;
+    color: var(--sb-ink-dim);
+    margin-right: -1px;
+    transition: background 0.2s, color 0.2s;
+    clip-path:
+        polygon(
+            0 0,
+            calc(100% - 10px) 0,
+            100% 50%,
+            calc(100% - 10px) 100%,
+            0 100%,
+            10px 50%
+        );
+
+    &:first-child {
+        padding-left: 14px;
+        clip-path:
+            polygon(
+                0 0,
+                calc(100% - 10px) 0,
+                100% 50%,
+                calc(100% - 10px) 100%,
+                0 100%
+            );
+    }
+
+    &:last-child {
+        padding-right: 14px;
+        border-right: 1px solid var(--sb-rule);
+        clip-path:
+            polygon(
+                0 0,
+                100% 0,
+                100% 100%,
+                0 100%,
+                10px 50%
+            );
+    }
+}
+
+.o_owl_stage_done {
+    background: var(--sb-sky-l);
+    color: var(--sb-ink);
+}
+
+.o_owl_stage_current {
+    background: var(--sb-walnut);
+    color: var(--sb-linen);
+    font-weight: 600;
+}
+
+// G17 (2026-06-01) — date sub-label under each stage chip. Shows
+// when the order reached the stage (or empty for future stages).
+.o_owl_stage_label {
+    display: block;
+}
+
+.o_owl_stage_date {
+    display: block;
+    margin-top: 1px;
+    font-family: var(--sb-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    opacity: 0.7;
+}
+
+// ----- Phase 2.5 commit 1 — KitchenViewport ------------------------
+.o_owl_kitchen {
+    display: flex;
+    flex-direction: column;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    overflow: hidden;
+    min-height: 480px;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_kitchen_toolbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 8px 14px;
+    background: linear-gradient(to bottom,
+                                var(--sb-paper) 0%,
+                                #f4ecdc 100%);
+    border-bottom: 1px solid var(--sb-rule);
+    font-size: 12px;
+}
+
+.o_owl_kitchen_title {
+    font-family: var(--sb-font-display);
+    font-variation-settings: "opsz" 18, "wght" 600;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sb-walnut);
+}
+
+.o_owl_kitchen_status {
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+    font-style: italic;
+}
+
+// P25C3 — hover tooltip in kitchen toolbar.
+.o_owl_kitchen_hover {
+    font-family: var(--sb-font-mono);
+    font-size: 11px;
+    color: var(--sb-sky);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// P25C2 — solid↔blueline toggle button
+.o_owl_kitchen_mode_btn {
+    font-family: var(--sb-font-mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    background: white;
+    color: var(--sb-sky);
+    border: 1px solid var(--sb-sky);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) {
+        background: var(--sb-sky-l);
+    }
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.o_owl_kitchen_meta {
+    margin-left: auto;
+    font-family: var(--sb-font-mono);
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+}
+
+.o_owl_kitchen_stage {
+    position: relative;
+    flex: 1;
+    min-height: 420px;
+    overflow: hidden;
+}
+
+.o_owl_kitchen_canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.o_owl_kitchen_placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+        repeating-linear-gradient(
+            45deg,
+            var(--sb-paper),
+            var(--sb-paper) 10px,
+            var(--sb-linen) 10px,
+            var(--sb-linen) 20px
+        );
+    text-align: center;
+    color: var(--sb-ink-dim);
+    font-size: 12px;
+    line-height: 1.5;
+
+    code {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+        background: white;
+        border: 1px solid var(--sb-rule);
+        padding: 1px 5px;
+        border-radius: 2px;
+        color: var(--sb-ink);
+    }
+}
+
+// ----- T2C12 FooterActions -----------------------------------------
+.o_owl_footer {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 28px;
+    padding: 18px 22px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-top: 2px solid var(--sb-walnut);
+    border-radius: 2px;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_footer_actions {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.o_owl_btn {
+    font-family: var(--sb-font-sans);
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1.4;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.o_owl_btn_primary {
+    background: var(--sb-walnut);
+    color: var(--sb-linen);
+    border-color: var(--sb-walnut);
+
+    &:hover:not(:disabled) {
+        background: var(--sb-walnut-d);
+        border-color: var(--sb-walnut-d);
+    }
+}
+
+.o_owl_btn_secondary {
+    background: white;
+    color: var(--sb-ink);
+    border-color: var(--sb-rule);
+
+    &:hover:not(:disabled) {
+        background: var(--sb-linen);
+        border-color: var(--sb-rule-d);
+    }
+}
+
+.o_owl_footer_total {
+    text-align: right;
+    border-left: 1px solid var(--sb-rule);
+    padding-left: 24px;
+    min-width: 240px;
+}
+
+.o_owl_footer_total_label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sb-ink-dim);
+    margin-bottom: 4px;
+}
+
+.o_owl_footer_total_value {
+    font-size: 28px;
+    color: var(--sb-walnut);
+    font-variation-settings: "opsz" 36, "wght" 600;
+    letter-spacing: -0.01em;
+
+    &.mono {
+        font-family: var(--sb-font-mono);
+        font-variation-settings: normal;
+    }
+}
+
+.o_owl_footer_total_sub {
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+    margin-top: 4px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+
+    .o_owl_channel_badge {
+        margin: 0;
+    }
+}
+
+// ---------------------------------------------------------------------
+// Step 5 — Send-to-Production confirmation modal.
+// Inline overlay opened by FooterActions when a dealer clicks the
+// primary action. Dimmed backdrop + centred card; tokens-driven.
+// ---------------------------------------------------------------------
+.o_owl_modal_backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 24, 20, 0.42);   // sb-ink @ ~42% alpha
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.o_owl_modal {
+    max-width: 460px;
+    width: 100%;
+    background: var(--sb-linen);
+    border: 1px solid var(--sb-rule);
+    border-radius: 4px;
+    color: var(--sb-ink);
+    font-family: var(--sb-font-sans);
+    box-shadow: 0 16px 40px rgba(26, 24, 20, 0.24);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.o_owl_modal_head {
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid var(--sb-rule);
+}
+
+.o_owl_modal_title {
+    font-family: var(--sb-font-display);
+    font-variation-settings: "opsz" 36, "wght" 500;
+    // 2026-06-02 fluid scale — clamp() so titles grow / shrink with
+    // viewport. Bare px would freeze across mobile → 4K.
+    font-size: clamp(1.05rem, calc(1rem + 0.8vw), 1.5rem);
+    line-height: 1.25;
+    color: var(--sb-walnut);
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+}
+
+.o_owl_modal_sub {
+    font-size: clamp(0.8rem, calc(0.76rem + 0.25vw), 0.9rem);
+    line-height: 1.5;
+    color: var(--sb-ink-dim);
+    margin: 0;
+}
+
+.o_owl_modal_review {
+    margin: 0;
+    padding: 18px 28px;
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 18px;
+    align-items: baseline;
+    font-size: 13px;
+
+    dt {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--sb-ink-dim);
+        margin: 0;
+        font-weight: 400;
+    }
+
+    dd {
+        margin: 0;
+        color: var(--sb-ink);
+
+        &.mono {
+            font-family: var(--sb-font-mono);
+        }
+    }
+}
+
+.o_owl_modal_grand {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--sb-walnut);
+}
+
+.o_owl_modal_foot {
+    padding: 16px 28px;
+    border-top: 1px solid var(--sb-rule);
+    background: var(--sb-paper);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.o_owl_action_msg {
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-left: 4px solid var(--sb-sky);
+    border-radius: 2px;
+    font-size: 12px;
+    color: var(--sb-ink);
+    font-family: var(--sb-font-mono);
+}
+
+// ----- T2C11 BoMPreview --------------------------------------------
+.o_owl_bom {
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_bom_summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+}
+
+.o_owl_bom_summary_cell {
+    border-right: 1px solid var(--sb-rule);
+    padding-right: 16px;
+
+    &:last-child {
+        border-right: none;
+        padding-right: 0;
+    }
+}
+
+.o_owl_bom_label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sb-ink-dim);
+    margin-bottom: 4px;
+}
+
+.o_owl_bom_value {
+    font-size: 22px;
+    color: var(--sb-ink);
+    font-variation-settings: "opsz" 28, "wght" 500;
+
+    &.mono {
+        font-family: var(--sb-font-mono);
+        font-variation-settings: normal;
+    }
+}
+
+.o_owl_bom_section {
+    font-family: var(--sb-font-display);
+    font-variation-settings: "opsz" 18, "wght" 600;
+    font-size: 13px;
+    color: var(--sb-walnut);
+    margin: 14px 0 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.o_owl_bom_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+    font-size: 12px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    overflow: hidden;
+
+    thead {
+        background: #faf4e8;
+    }
+    th, td {
+        text-align: left;
+        padding: 8px 14px;
+        border-bottom: 1px solid var(--sb-rule);
+    }
+    th {
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--sb-ink-dim);
+        font-weight: 600;
+    }
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .mono {
+        font-family: var(--sb-font-mono);
+    }
+}
+
+.o_owl_bom_foot {
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+// ----- T2C11 ValidationStrip ---------------------------------------
+.o_owl_validation {
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_validation_ok {
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-left: 4px solid var(--sb-ok);
+    border-radius: 2px;
+    padding: 16px 20px;
+
+    strong {
+        color: var(--sb-ok);
+        font-size: 14px;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .o_owl_validation_foot {
+        font-size: 12px;
+        color: var(--sb-ink-dim);
+        margin: 0;
+    }
+}
+
+.o_owl_validation_list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.o_owl_validation_item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-left-width: 4px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.o_owl_validation_hard { border-left-color: var(--sb-alert); }
+.o_owl_validation_soft { border-left-color: var(--sb-warn); }
+
+.o_owl_validation_sev {
+    flex: 0 0 60px;
+    font-family: var(--sb-font-mono);
+    font-size: 10px;
+    color: var(--sb-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.o_owl_validation_msg {
+    flex: 1;
+    color: var(--sb-ink);
+}
+
+.o_owl_validation_ref {
+    flex: 0 0 auto;
+    font-family: var(--sb-font-mono);
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+}
+
+// ----- T2C10 ConfigDrawer ------------------------------------------
+.o_owl_drawer {
+    // grid-column: 1 / -1 set inline so it spans all 8 grid columns
+    // of the parent ZoneGroup .o_owl_lines container.
+    background: var(--sb-paper);
+    border-top: 2px solid var(--sb-walnut);
+    border-bottom: 1px solid var(--sb-rule);
+    padding: 18px 24px 20px;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_drawer_head {
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.o_owl_drawer_title {
+    font-family: var(--sb-font-display);
+    font-variation-settings: "opsz" 24, "wght" 600;
+    font-size: 14px;
+    color: var(--sb-walnut);
+    letter-spacing: -0.005em;
+}
+
+.o_owl_drawer_pill {
+    margin-left: auto;
+    font-family: var(--sb-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    background: var(--sb-sky);
+    color: var(--sb-linen);
+    padding: 3px 8px;
+    border-radius: 2px;
+    transition: background 0.15s;
+
+    &.o_owl_drawer_pill_saving { background: var(--sb-warn); }
+    &.o_owl_drawer_pill_error  { background: var(--sb-alert); }
+}
+
+.o_owl_drawer_grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px 24px;
+    align-items: start;
+}
+
+.o_owl_attr {
+    label {
+        display: block;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--sb-ink-dim);
+        margin-bottom: 4px;
+    }
+}
+
+.o_owl_attr_wide {
+    grid-column: span 4;       // full row for the Spec text
+}
+
+.o_owl_attr_value {
+    font-size: 13px;
+    color: var(--sb-ink);
+    word-break: break-word;
+
+    &.mono {
+        font-family: var(--sb-font-mono);
+    }
+}
+
+.o_owl_attr_sku {
+    font-family: var(--sb-font-mono);
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+    margin-left: 6px;
+}
+
+.o_owl_qty_input {
+    width: 80px;
+    padding: 5px 8px;
+    font-family: var(--sb-font-mono);
+    font-size: 13px;
+    color: var(--sb-ink);
+    background: white;
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    transition: border-color 0.15s;
+
+    &:focus {
+        outline: none;
+        border-color: var(--sb-walnut);
+    }
+    &:disabled {
+        background: var(--sb-linen);
+        color: var(--sb-ink-dim);
+    }
+}
+
+.o_owl_drawer_retail {
+    text-decoration: line-through;
+    color: var(--sb-ink-dim);
+}
+
+.o_owl_drawer_foot {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--sb-rule);
+    font-size: 11px;
+    color: var(--sb-ink-dim);
+    line-height: 1.5;
+}
+
+// ----- T2C9 ZoneGroup + OrderLine ----------------------------------
+.o_owl_zone {
+    margin-top: 14px;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    overflow: hidden;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_zone_header {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: linear-gradient(
+        to bottom,
+        var(--sb-paper) 0%,
+        #f4ecdc 100%
+    );
+    border-bottom: 1px solid var(--sb-rule);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+}
+
+.o_owl_zone_chevron {
+    margin-right: 8px;
+    color: var(--sb-walnut);
+    font-family: var(--sb-font-mono);
+    display: inline-block;
+    width: 12px;
+    transition: transform 0.15s;
+}
+
+.o_owl_zone_collapsed .o_owl_zone_chevron {
+    transform: rotate(-90deg);
+}
+
+.o_owl_zone_collapsed .o_owl_zone_header {
+    border-bottom-color: transparent;
+}
+
+.o_owl_zone_name {
+    font-weight: 600;
+    color: var(--sb-ink);
+}
+
+.o_owl_zone_count {
+    margin-left: 8px;
+    color: var(--sb-ink-dim);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.o_owl_zone_subtotal {
+    margin-left: auto;
+    font-family: var(--sb-font-mono);
+    font-size: 12px;
+    color: var(--sb-ink);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.o_owl_zone_retail {
+    text-decoration: line-through;
+    color: var(--sb-ink-dim);
+    margin-right: 10px;
+}
+
+.o_owl_zone_channel {
+    font-weight: 600;
+}
+
+// 8-column grid driving both header + each line row.
+.o_owl_lines {
+    display: grid;
+    grid-template-columns: 36px 1.6fr 70px 1fr 80px 100px 100px 32px;
+    font-size: 12px;
+}
+
+.o_owl_line_head,
+.o_owl_line {
+    display: contents;
+}
+
+.o_owl_line_head > div {
+    padding: 8px 10px;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sb-ink-dim);
+    border-bottom: 1px solid var(--sb-rule);
+    background: #faf4e8;
+    align-self: center;
+}
+
+.o_owl_th_center { text-align: center; }
+.o_owl_th_right  { text-align: right; }
+
+.o_owl_line > div {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--sb-rule);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.o_owl_line:hover > div {
+    background: #faf2dd;
+}
+
+.o_owl_line_selected > div {
+    background: var(--sb-hl);
+}
+
+.o_owl_lineno {
+    font-family: var(--sb-font-mono);
+    color: var(--sb-ink-dim);
+    font-size: 11px;
+    justify-content: center;
+}
+
+.o_owl_line_tpl {
+    font-weight: 500;
+    color: var(--sb-ink);
+}
+
+.o_owl_line_xmlid {
+    font-family: var(--sb-font-mono);
+    font-size: 10px;
+    color: var(--sb-ink-dim);
+    margin-left: 6px;
+}
+
+.o_owl_line_dim {
+    font-family: var(--sb-font-mono);
+    color: var(--sb-ink);
+}
+
+.o_owl_line_spec {
+    color: var(--sb-ink);
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.o_owl_line_qty {
+    font-family: var(--sb-font-mono);
+    justify-content: center;
+}
+
+.o_owl_line_price {
+    font-family: var(--sb-font-mono);
+    justify-content: flex-end;
+    white-space: nowrap;
+}
+
+.o_owl_line_retail {
+    text-decoration: line-through;
+    color: var(--sb-ink-dim);
+    font-size: 11px;
+}
+
+.o_owl_line_menu {
+    color: var(--sb-ink-dim);
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover { color: var(--sb-walnut); }
+}
+
+// Per-line badges (MAPLE, RULE, etc.)
+.o_owl_badge {
+    display: inline-block;
+    font-family: var(--sb-font-mono);
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-left: 5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.o_owl_badge_maple {
+    background: var(--sb-walnut);
+    color: var(--sb-linen);
+}
+
+.o_owl_badge_rule {
+    background: var(--sb-sky);
+    color: var(--sb-linen);
+}
+
+.o_owl_lines_empty {
+    em { font-style: italic; color: var(--sb-ink-dim); }
+}
+
+// ----- T2C8 TabBar -------------------------------------------------
+.o_owl_tabs {
+    display: flex;
+    gap: 0;
+    margin-top: 18px;
+    border-bottom: 1px solid var(--sb-rule-d);
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_tab {
+    padding: 10px 18px;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sb-ink-dim);
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-bottom-color 0.15s;
+
+    &:hover:not(.o_owl_tab_active) {
+        color: var(--sb-walnut);
+    }
+}
+
+.o_owl_tab_active {
+    color: var(--sb-ink);
+    border-bottom-color: var(--sb-walnut);
+    font-weight: 600;
+}
+
+.o_owl_tab_count {
+    display: inline-block;
+    font-family: var(--sb-font-mono);
+    background: var(--sb-rule);
+    color: var(--sb-ink);
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    margin-left: 6px;
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1.4;
+}
+
+.o_owl_tab_panel {
+    padding: 24px 0 0;
+    min-height: 200px;
+}
+
+.o_owl_panel_placeholder {
+    background: var(--sb-paper);
+    border: 1px dashed var(--sb-rule);
+    border-radius: 3px;
+    padding: 20px 24px;
+    color: var(--sb-ink-dim);
+    line-height: 1.55;
+    font-family: var(--sb-font-sans);
+
+    strong {
+        color: var(--sb-walnut);
+        font-size: 13px;
+        display: inline-block;
+        margin-right: 4px;
+    }
+
+    small {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+    }
+}
+
+// ----- T2C6 HeaderStrip — 5-cell row (mockup §HeaderStrip) ---------
+//
+// Grid template proportions match the mockup: customer cell is
+// slightly wider (1.4fr) so the partner name + via + badge fit
+// without truncation; the four numeric cells share the remainder.
+.o_owl_header_strip {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+    background: var(--sb-paper);
+    border: 1px solid var(--sb-rule);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    font-family: var(--sb-font-sans);
+}
+
+.o_owl_hs_cell {
+    padding: 14px 18px;
+    border-right: 1px solid var(--sb-rule);
+    // Grid items default to min-width:auto which prevents shrinking
+    // below content size — explicit min-width:0 lets the cell honour
+    // its 1fr/1.4fr track allotment instead of overflowing the strip.
+    min-width: 0;
+
+    &:last-child {
+        border-right: none;
+    }
+}
+
+.o_owl_hs_label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sb-ink-dim);
+    margin-bottom: 6px;
+}
+
+.o_owl_hs_value {
+    font-variation-settings: "opsz" 28, "wght" 500;
+    font-size: 18px;
+    color: var(--sb-ink);
+    line-height: 1.2;
+    // 2026-06-02 fix — drop word-break:break-word which was wrapping
+    // multi-word names mid-character ("Sarah Johnso\nn"). Defaults
+    // (word-break:normal + overflow-wrap:normal) wrap on whitespace.
+    // overflow-wrap:break-word kicks in only as last-resort for an
+    // unbreakable single token longer than the cell — keeps the
+    // strip layout from overflowing while preserving word-boundary
+    // wrapping for normal names.
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: none;
+
+    &.mono {
+        font-family: var(--sb-font-mono);
+        font-variation-settings: normal;
+    }
+}
+
+.o_owl_hs_sub {
+    font-size: 11px;
+    font-variation-settings: "opsz" 11, "wght" 400;
+    color: var(--sb-ink-dim);
+    margin-left: 4px;
+    font-weight: 400;
+}
+
+// Customer cell — sky-tinted background per mockup so the
+// channel badge anchors visually below the partner name.
+.o_owl_hs_customer {
+    background: var(--sb-sky-l);
+
+    .o_owl_channel_badge {
+        margin: 6px 0 0;
+        display: inline-block;
+    }
+}
+
+// Savings cell — value renders in success-green for the
+// "you saved $X" affordance.
+.o_owl_hs_savings .o_owl_hs_value {
+    color: var(--sb-ok);
+}
+
+// ----- OWL OrderBuilder root (T2C2 commit's component) ------------
+//
+// 2026-06-01: removed the 640px cap. The mount container
+// (.o_southbrook_owl_mount) is typically ~690px wide on portal pages;
+// the 640px cap forced inner grid columns + the titlebar heading to
+// wrap text ("Demo Tradesperson (Tier 3)" split across two lines,
+// dollar values clipped to "$3,27" / "5"). Letting the frame fill
+// its parent gives the inner content the full ~634px of usable
+// width after the 28px×2 padding.
+.o_southbrook_owl_root {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 32px 28px;
+    background: var(--sb-linen);
+    border: 1px solid var(--sb-rule);
+    border-radius: 4px;
+    color: var(--sb-ink);
+    line-height: 1.55;
+
+    .o_owl_heading {
+        font-family: var(--sb-font-display);
+        font-variation-settings: "opsz" 36, "wght" 500;
+        font-size: 18px;
+        color: var(--sb-walnut);
+        margin-bottom: 8px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+    }
+
+    .o_owl_subhead {
+        font-size: 13px;
+        color: var(--sb-ink-dim);
+        margin-bottom: 16px;
+    }
+
+    .o_owl_counter_btn {
+        font-family: var(--sb-font-mono);
+        font-size: 13px;
+        margin-top: 4px;
+        // Custom Bootstrap-outline override to land on Southbrook
+        // sky accent rather than Bootstrap blue.
+        color: var(--sb-sky);
+        border-color: var(--sb-sky);
+        background: transparent;
+
+        &:hover, &:focus {
+            background: var(--sb-sky-l);
+            color: var(--sb-sky);
+            border-color: var(--sb-sky);
+        }
+    }
+
+    .o_owl_status {
+        font-size: 11px;
+        color: var(--sb-ink-dim);
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px solid var(--sb-rule);
+    }
+
+    code {
+        font-family: var(--sb-font-mono);
+        font-size: 11px;
+        background: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        padding: 1px 5px;
+        border-radius: 2px;
+        color: var(--sb-ink);
+    }
+
+    p {
+        font-family: var(--sb-font-sans);
+    }
+
+    // ==================================================================
+    // G11 + G12 + G13 (2026-06-01) — CatalogPicker modal + Add Cabinet
+    // CTAs in the empty state and inline above the zone grid.
+    // ==================================================================
+
+    .o_owl_lines_empty {
+        text-align: center;
+        padding: 48px 32px;
+
+        strong {
+            display: block;
+            font-family: var(--sb-font-display);
+            font-size: 22px;
+            color: var(--sb-walnut);
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: var(--sb-ink-dim);
+            max-width: 480px;
+            margin: 0 auto 24px;
+            line-height: 1.5;
+        }
+    }
+
+    .o_owl_add_cabinet_btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border: 1px solid var(--sb-walnut);
+        background: var(--sb-walnut);
+        color: var(--sb-linen);
+        border-radius: 4px;
+        font-family: var(--sb-font-display);
+        font-weight: 500;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        transition: background 150ms ease;
+
+        &:hover, &:focus {
+            background: var(--sb-walnut-d, #4a2b1d);
+            border-color: var(--sb-walnut-d, #4a2b1d);
+            color: var(--sb-linen);
+        }
+    }
+
+    .o_owl_add_cabinet_lg {
+        padding: 16px 32px;
+        font-size: 16px;
+    }
+
+    .o_owl_lines_topbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        background: var(--sb-linen);
+        border: 1px solid var(--sb-rule);
+        border-radius: 4px;
+        margin-bottom: 16px;
+    }
+
+    .o_owl_lines_count {
+        font-family: var(--sb-font-mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: var(--sb-ink-dim);
+    }
+
+    // ==================================================================
+    // Catalog picker (2026-06-02 redesign).
+    //
+    // Modal panel + redesigned toolbar / pills / card grid. Brand
+    // accent is the Southbrook walnut (#7c3f3f request from the
+    // redesign brief — matched here via var(--sb-walnut) so theme
+    // tokens stay the single source of truth; hover state uses
+    // var(--sb-walnut-deep) where available, falling back to a
+    // darker hex literal where the token isn't defined yet).
+    // ==================================================================
+
+    // Shared accent — central definition so the cards / pills / Add
+    // button stay in lockstep if the walnut token shifts.
+    $catalog-accent:        var(--sb-walnut);
+    $catalog-accent-deep:   #693535;
+
+    // 2026-06-02 fluid typography scale. clamp(min, preferred, max)
+    // so text scales smoothly between mobile and desktop without
+    // exploding on 4K (the cap is the second arg's clamp ceiling).
+    // Always paired with a unitless line-height so vertical rhythm
+    // scales too. Reused by every catalog typography rule below;
+    // tuning the scale happens here, not at every call site.
+    // calc() inside clamp() defers the rem + vw addition to the
+    // browser's runtime CSS engine. Without it, SASS errors at
+    // compile time with "Incompatible units: 'vw' and 'rem'".
+    $cp-title:   clamp(1.05rem,  calc(1rem    + 0.8vw),  1.5rem);   // modal/section titles
+    $cp-name:    clamp(0.9rem,   calc(0.85rem + 0.4vw),  1.05rem);  // card name
+    $cp-price:   clamp(1rem,     calc(0.95rem + 0.5vw),  1.2rem);   // card price (emphasized)
+    $cp-body:    clamp(0.8rem,   calc(0.76rem + 0.25vw), 0.9rem);   // tabs, count, search input
+    $cp-desc:    clamp(0.75rem,  calc(0.72rem + 0.2vw),  0.85rem);  // description + empty body
+    $cp-meta:    clamp(0.7rem,   calc(0.68rem + 0.15vw), 0.8rem);   // sku, dims, busy, qty input
+    $cp-micro:   clamp(0.6rem,   calc(0.58rem + 0.1vw),  0.7rem);   // badges, tab count, channel lbl
+    // Card-grid min-track width: shrinks on small viewports so
+    // cards don't get uncomfortably narrow before wrapping.
+    // calc() wrap for same SASS unit-add reason as above.
+    $cp-card-min: clamp(180px, calc(18vw + 100px), 232px);
+
+    // Modal shell shared by the catalog picker.
+    .o_owl_modal_panel {
+        background: var(--sb-linen);
+        border: 1px solid var(--sb-rule);
+        border-radius: 12px;
+        color: var(--sb-ink);
+        font-family: var(--sb-font-sans);
+        box-shadow: 0 16px 40px rgba(26, 24, 20, 0.24);
+        display: flex;
+        flex-direction: column;
+        max-height: 90vh;
+        overflow: hidden;
+    }
+
+    .o_owl_modal_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px 14px;
+        border-bottom: 1px solid var(--sb-rule);
+    }
+
+    .o_owl_modal_close {
+        background: transparent;
+        border: 0;
+        font-size: clamp(1.25rem, calc(1.1rem + 0.6vw), 1.7rem);
+        line-height: 1;
+        color: var(--sb-ink-dim);
+        padding: 4px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--sb-walnut);
+            background: var(--sb-paper);
+        }
+    }
+
+    .o_owl_catalog_panel {
+        max-width: 1040px;
+        width: 100%;
+    }
+
+    .o_owl_catalog_panel_list {
+        max-width: 760px;
+    }
+
+    // Footer — added-count summary + Cancel/Done. Both buttons just
+    // close (items persist live as they're added), so they differ
+    // only in label/emphasis. Mirrors the header's 24px gutter and
+    // the --sb-rule divider used by header/toolbar.
+    .o_owl_modal_footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 24px;
+        border-top: 1px solid var(--sb-rule);
+    }
+
+    .o_owl_modal_footer_actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .o_owl_catalog_added_count {
+        font-size: $cp-meta;
+        color: var(--sb-ink-dim);
+    }
+
+    .o_owl_modal_btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-family: var(--sb-font-sans);
+        border: 1px solid var(--sb-rule);
+
+        &:hover { filter: brightness(0.97); }
+    }
+
+    .o_owl_modal_btn_secondary {
+        background: var(--sb-paper);
+        color: var(--sb-ink);
+    }
+
+    .o_owl_modal_btn_primary {
+        background: var(--sb-walnut);
+        color: var(--sb-linen);
+        border-color: var(--sb-walnut);
+    }
+
+    // Toolbar — search + view toggle.
+    .o_owl_catalog_toolbar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 24px 12px;
+        border-bottom: 1px solid var(--sb-rule);
+    }
+
+    .o_owl_catalog_search_wrap {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .o_owl_catalog_search_icon {
+        position: absolute;
+        left: 12px;
+        width: 16px;
+        height: 16px;
+        color: var(--sb-ink-dim);
+        pointer-events: none;
+    }
+
+    .o_owl_catalog_search {
+        width: 100%;
+        padding: 10px 12px 10px 36px;
+        font-family: var(--sb-font-sans);
+        font-size: $cp-body;
+        line-height: 1.35;
+        color: var(--sb-ink);
+        background: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        border-radius: 999px;
+        transition: border-color 120ms ease, box-shadow 120ms ease;
+
+        &::placeholder {
+            color: var(--sb-ink-dim);
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $catalog-accent;
+            box-shadow: 0 0 0 3px rgba(124, 63, 63, 0.18);
+            background: white;
+        }
+    }
+
+    .o_owl_catalog_view_toggle {
+        display: inline-flex;
+        background: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .o_owl_catalog_view_btn {
+        background: transparent;
+        border: 0;
+        padding: 8px 10px;
+        cursor: pointer;
+        color: var(--sb-ink-dim);
+        display: inline-flex;
+        align-items: center;
+
+        svg { width: 16px; height: 16px; }
+
+        &:hover {
+            color: var(--sb-walnut);
+            background: rgba(124, 63, 63, 0.06);
+        }
+    }
+
+    .o_owl_catalog_view_btn_active {
+        background: $catalog-accent;
+        color: white;
+
+        &:hover {
+            background: $catalog-accent-deep;
+            color: white;
+        }
+    }
+
+    // 2026-06-02 filter v2 — compact single-row underlined tab bar.
+    // Replaces the prior 7-pill chip row which wrapped to 3 rows on
+    // narrow widths (~137px vertical). Target row height ~36–40px.
+    //
+    // Layout choices:
+    //   - flex-wrap: nowrap + overflow-x: auto — never wrap to row 2;
+    //     instead scroll horizontally when tabs exceed available width.
+    //   - Tab visual: plain text + small superscript count + 2px
+    //     bottom border that thickens to accent on active. No chip,
+    //     no rounded radius, minimal padding.
+    //   - Source order is the LOGICAL catalog order
+    //     (All / Base / Wall / Tall / Drawer / Vanity / Extras),
+    //     not alphabetical — see CatalogPicker.CATEGORY_ORDER in
+    //     portal_boot.esm.js.
+    .o_owl_catalog_tabs {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 4px;
+        padding: 2px 24px;
+        border-bottom: 1px solid var(--sb-rule);
+        background: var(--sb-paper);
+
+        // 2026-06-02 fix — give the nav a stable minimum height that
+        // matches the tab content's intrinsic height (text + padding
+        // + 2px underline + container padding). Without this the
+        // flex parent collapses to ~16px on first paint and the
+        // overflow-y:hidden crops the lower half of each tab label
+        // until the next layout pass kicks in. clamp() pairs with the
+        // fluid font scale so the height adapts at large viewport
+        // widths.
+        //
+        // Also flex-shrink:0 so a parent flex container (the modal
+        // panel) can't compress the nav out of existence on tight
+        // vertical space.
+        min-height: clamp(38px, calc(34px + 0.5vw), 44px);
+        flex-shrink: 0;
+
+        // iOS / touch smooth horizontal swipe.
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+
+        // Slim scrollbar — present but unobtrusive on overflow.
+        scrollbar-width: thin;
+        scrollbar-color: var(--sb-rule) transparent;
+
+        &::-webkit-scrollbar      { height: 4px; }
+        &::-webkit-scrollbar-track { background: transparent; }
+        &::-webkit-scrollbar-thumb {
+            background: var(--sb-rule);
+            border-radius: 2px;
+        }
+
+        // Right-edge fade affordance — hints there's more to scroll
+        // when the row overflows. position:sticky-ish via mask-image.
+        mask-image: linear-gradient(
+            to right,
+            black 0,
+            black calc(100% - 24px),
+            transparent 100%
+        );
+    }
+
+    .o_owl_catalog_tab {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: baseline;
+        gap: 3px;
+        background: transparent;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        color: var(--sb-ink-dim);
+        padding: 8px 10px;
+        border-radius: 0;
+        font-family: var(--sb-font-sans);
+        font-size: $cp-body;
+        line-height: 1.3;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: color 120ms ease, border-color 120ms ease;
+
+        &:hover {
+            color: $catalog-accent;
+        }
+
+        // Visible focus ring on keyboard navigation only — not on click.
+        &:focus-visible {
+            outline: none;
+            border-bottom-color: rgba(124, 63, 63, 0.4);
+            color: $catalog-accent;
+        }
+    }
+
+    .o_owl_catalog_tab_label {
+        font-weight: 400;
+    }
+
+    .o_owl_catalog_tab_count {
+        // Superscript: small, muted, no chip background.
+        font-family: var(--sb-font-mono);
+        font-size: $cp-micro;
+        line-height: 1;
+        color: var(--sb-ink-dim);
+        // Reset <sup> default vertical offset to be subtle, not jumpy.
+        vertical-align: super;
+        font-feature-settings: "sups" 0; // we control the offset ourselves
+    }
+
+    .o_owl_catalog_tab_active {
+        color: $catalog-accent;
+        border-bottom-color: $catalog-accent;
+
+        .o_owl_catalog_tab_label {
+            font-weight: 500;
+        }
+
+        .o_owl_catalog_tab_count {
+            color: $catalog-accent;
+        }
+
+        &:hover { color: $catalog-accent-deep; }
+    }
+
+    // 2026-06-02 filter v2 alternative — compact <select> dropdown.
+    // Renders inside the toolbar, left of the search input, when
+    // state.filterMode === 'select'. Shares setCategory with the
+    // tab bar.
+    .o_owl_catalog_filter_select {
+        flex: 0 0 auto;
+        padding: 9px 28px 9px 14px;
+        font-family: var(--sb-font-sans);
+        font-size: $cp-body;
+        line-height: 1.3;
+        color: var(--sb-ink);
+        background-color: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        border-radius: 999px;
+        cursor: pointer;
+        appearance: none;
+        // Inline SVG chevron — same walnut as the other accent UI.
+        background-image:
+            url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%237c3f3f' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='1.5,2 6,6.5 10.5,2'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+        transition: border-color 120ms ease, box-shadow 120ms ease;
+
+        &:focus {
+            outline: none;
+            border-color: $catalog-accent;
+            box-shadow: 0 0 0 3px rgba(124, 63, 63, 0.18);
+            background-color: white;
+        }
+    }
+
+    // Scrollable body + count line.
+    .o_owl_catalog_body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 24px 24px;
+    }
+
+    .o_owl_catalog_count {
+        margin: 0 0 14px;
+        font-size: $cp-body;
+        line-height: 1.4;
+        color: var(--sb-ink-dim);
+
+        strong {
+            color: var(--sb-walnut);
+            font-weight: 600;
+        }
+    }
+
+    // Card grid. Track min adapts: clamp() shrinks the column floor on
+    // small viewports so cards don't get uncomfortably narrow before
+    // wrapping, while capping at the original 232px on desktop.
+    .o_owl_catalog_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax($cp-card-min, 1fr));
+        gap: 14px;
+    }
+
+    // 2026-06-02 layout v3 — three-region structure (icon / content /
+    // aside) so list mode flex-rows cleanly with a flexible middle
+    // column. Grid mode uses CSS Grid: row 1 has icon | content, row 2
+    // has aside spanning full width below.
+    //
+    // CRITICAL invariants this layout depends on:
+    //   - .o_owl_catalog_card_content { flex:1 1 auto; min-width:0 }
+    //     in list mode — without min-width:0 the column never shrinks
+    //     below its CONTENT min-width and text wraps per-character.
+    //   - .o_owl_catalog_card_icon  { flex:0 0 auto } — fixed width.
+    //   - .o_owl_catalog_card_aside { flex:0 0 auto } — fixed width.
+    //   - Source order is icon -> content -> aside so DOM reading
+    //     order matches the visual left-to-right scan.
+    .o_owl_catalog_card {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-areas:
+            "icon  content"
+            "aside aside";
+        column-gap: 10px;
+        row-gap: 8px;
+        padding: 12px 14px;
+        background: white;
+        border: 1px solid var(--sb-rule);
+        border-radius: 12px;
+        transition: all 160ms ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            border-color: $catalog-accent;
+            box-shadow: 0 10px 24px rgba(74, 60, 46, 0.10);
+        }
+    }
+
+    .o_owl_catalog_card_added {
+        border-color: rgb(102, 187, 106);
+        box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.18);
+    }
+
+    .o_owl_catalog_card_icon {
+        grid-area: icon;
+        flex: 0 0 auto;          // honoured when list-mode switches to flex
+        align-self: start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width:  clamp(40px, calc(32px + 1.4vw), 56px);
+        height: clamp(40px, calc(32px + 1.4vw), 56px);
+        border-radius: 8px;
+        background: linear-gradient(
+            135deg,
+            var(--sb-linen) 0%,
+            var(--sb-paper) 100%
+        );
+        color: var(--sb-walnut);
+
+        svg {
+            width:  70%;
+            height: 70%;
+        }
+    }
+
+    .o_owl_catalog_card_content {
+        grid-area: content;
+        flex: 1 1 auto;          // honoured when list-mode switches to flex
+        min-width: 0;            // CRITICAL: allow column to shrink without
+                                 // forcing per-character text wraps
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .o_owl_catalog_card_titles {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .o_owl_catalog_card_aside {
+        grid-area: aside;
+        flex: 0 0 auto;          // honoured when list-mode switches to flex
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    // ==================================================================
+    // List-mode override — single flex-row with three regions.
+    // Source order (icon -> content -> aside) drives the visual left-to-
+    // right reading order without any reordering tricks.
+    // ==================================================================
+    .o_owl_catalog_grid_list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+
+        .o_owl_catalog_card {
+            // Reset the grid template — list mode is plain flex.
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            grid-template-columns: none;
+            grid-template-areas: none;
+            column-gap: 0;
+            row-gap: 0;
+            gap: 14px;
+            padding: 10px 14px;
+            flex-wrap: wrap;    // allow aside to wrap below content on
+                                // very narrow viewports (modal width
+                                // shrink) instead of overflowing.
+        }
+
+        // Aside hugs the right edge; price stacked ABOVE actions.
+        // On wrap (very narrow viewport) the whole aside drops below
+        // content as a single block rather than overflowing.
+        .o_owl_catalog_card_aside {
+            margin-left: auto;
+            align-items: flex-end;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .o_owl_catalog_card_price_row {
+            white-space: nowrap;
+            justify-content: flex-end;
+        }
+    }
+
+    .o_owl_catalog_card_badge {
+        display: inline-flex;
+        align-self: flex-start;
+        padding: 2px 10px;
+        font-family: var(--sb-font-mono);
+        font-size: $cp-micro;
+        line-height: 1.6;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--sb-walnut);
+        background: rgba(124, 63, 63, 0.08);
+        border-radius: 999px;
+    }
+
+    // Per-element top margins removed — spacing is owned by the
+    // parent .o_owl_catalog_card flex gap so optional rows with
+    // t-if collapse to ZERO space when their data is absent.
+    .o_owl_catalog_card_name {
+        margin: 0;
+        font-family: var(--sb-font-display);
+        font-weight: 500;
+        font-size: $cp-name;
+        color: var(--sb-ink);
+        line-height: 1.25;
+    }
+
+    .o_owl_catalog_card_sku {
+        font-family: var(--sb-font-mono);
+        font-size: $cp-meta;
+        line-height: 1.35;
+        letter-spacing: 0.04em;
+        color: var(--sb-ink-dim);
+    }
+
+    .o_owl_catalog_card_desc {
+        margin: 0;
+        font-size: $cp-desc;
+        line-height: 1.45;
+        color: var(--sb-ink-dim);
+    }
+
+    .o_owl_catalog_card_dims {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+        font-family: var(--sb-font-mono);
+        font-size: $cp-meta;
+        line-height: 1.4;
+        color: var(--sb-ink-dim);
+
+        svg {
+            // Scales with the surrounding text via 1em so the ruler
+            // glyph tracks the dimension string at any viewport.
+            width: 1em;
+            height: 1em;
+            color: var(--sb-ink-dim);
+        }
+    }
+
+    .o_owl_catalog_card_price_row {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0;
+    }
+
+    .o_owl_catalog_card_price_lbl {
+        font-family: var(--sb-font-mono);
+        font-size: $cp-micro;
+        line-height: 1.4;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--sb-ink-dim);
+    }
+
+    .o_owl_catalog_card_price {
+        font-family: var(--sb-font-mono);
+        font-size: $cp-price;
+        line-height: 1.2;
+        font-weight: 600;
+        color: var(--sb-walnut);
+    }
+
+    // 2026-06-02 channel pricing — dual-price treatment when the
+    // visiting partner is on a non-retail pricelist. Strikethrough
+    // retail next to the emphasized channel price; tiny channel
+    // label in monospace.
+    .o_owl_catalog_card_price_strike {
+        font-family: var(--sb-font-mono);
+        font-size: $cp-desc;
+        line-height: 1.2;
+        font-weight: 400;
+        color: var(--sb-ink-dim);
+        text-decoration: line-through;
+    }
+
+    .o_owl_catalog_card_channel_lbl {
+        font-family: var(--sb-font-mono);
+        font-size: $cp-micro;
+        line-height: 1.6;
+        letter-spacing: 0.08em;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: rgba(124, 63, 63, 0.10);
+        color: var(--sb-walnut);
+        margin-left: auto;
+    }
+
+    // Card actions row — qty stepper + Add button. No margin-top:
+    // spacing is owned by the parent card's flex gap so cards with
+    // fewer rows (no description, no dimensions) shrink correctly.
+    .o_owl_catalog_card_actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .o_owl_catalog_qty {
+        display: inline-flex;
+        align-items: stretch;
+        border: 1px solid var(--sb-rule);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--sb-paper);
+    }
+
+    .o_owl_catalog_qty_btn {
+        background: transparent;
+        border: 0;
+        // Width sized via em so the stepper scales with its glyph.
+        width: 1.9em;
+        font-family: var(--sb-font-sans);
+        font-size: $cp-price;
+        line-height: 1.4;
+        font-weight: 500;
+        color: var(--sb-walnut);
+        cursor: pointer;
+        transition: background 120ms ease;
+
+        &:hover:not(:disabled) {
+            background: rgba(124, 63, 63, 0.08);
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+    }
+
+    .o_owl_catalog_qty_input {
+        // Width sized via em so the input grows with the digits at
+        // larger font sizes.
+        width: 2.6em;
+        text-align: center;
+        background: white;
+        border: 0;
+        border-left: 1px solid var(--sb-rule);
+        border-right: 1px solid var(--sb-rule);
+        font-family: var(--sb-font-mono);
+        font-size: $cp-body;
+        line-height: 1.35;
+        color: var(--sb-ink);
+        padding: 4px 0;
+
+        // Hide the spinner — qty buttons handle increment.
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        appearance: textfield;
+        -moz-appearance: textfield;
+
+        &:focus {
+            outline: none;
+            box-shadow: inset 0 0 0 2px rgba(124, 63, 63, 0.22);
+        }
+    }
+
+    .o_owl_catalog_add_btn {
+        background: $catalog-accent;
+        border: 1px solid $catalog-accent;
+        color: white;
+        font-family: var(--sb-font-sans);
+        font-size: $cp-body;
+        line-height: 1.3;
+        font-weight: 500;
+        padding: 0.5em 1.1em;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-width: 5em;
+        transition: all 140ms ease;
+
+        // SVG scales with the surrounding text via 1em.
+        svg { width: 1em; height: 1em; }
+
+        &:hover:not(:disabled) {
+            background: $catalog-accent-deep;
+            border-color: $catalog-accent-deep;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+
+    .o_owl_catalog_add_btn_added {
+        background: rgb(102, 187, 106);
+        border-color: rgb(102, 187, 106);
+
+        &:hover:not(:disabled) {
+            background: rgb(81, 152, 86);
+            border-color: rgb(81, 152, 86);
+        }
+    }
+
+    // Empty state.
+    .o_owl_catalog_empty {
+        text-align: center;
+        padding: 40px 24px;
+        color: var(--sb-ink-dim);
+        font-size: $cp-desc;
+        line-height: 1.5;
+
+        strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--sb-walnut);
+            font-size: $cp-name;
+            line-height: 1.25;
+        }
+
+        p { margin: 0 0 14px; }
+    }
+
+    .o_owl_catalog_empty_icon {
+        margin-bottom: 16px;
+        color: var(--sb-ink-dim);
+
+        svg {
+            width: 48px;
+            height: 48px;
+        }
+    }
+
+    .o_owl_catalog_empty_reset {
+        background: transparent;
+        border: 1px solid $catalog-accent;
+        color: $catalog-accent;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-family: var(--sb-font-sans);
+        font-size: $cp-body;
+        line-height: 1.3;
+        cursor: pointer;
+        transition: all 120ms ease;
+
+        &:hover {
+            background: $catalog-accent;
+            color: white;
+        }
+    }
+
+    .o_owl_catalog_busy {
+        text-align: center;
+        font-family: var(--sb-font-mono);
+        font-size: $cp-meta;
+        line-height: 1.4;
+        color: var(--sb-walnut);
+        margin: 20px 0 0;
+        letter-spacing: 0.04em;
+    }
+
+    // ==================================================================
+    // G15 (2026-06-01) — inline attribute picker inside the
+    // ConfigDrawer. Visible when a line is selected in the lines tab.
+    // ==================================================================
+
+    .o_owl_attr_picker {
+        margin-top: 16px;
+        padding: 16px;
+        background: var(--sb-paper);
+        border: 1px solid var(--sb-rule);
+        border-radius: 4px;
+    }
+
+    .o_owl_attr_picker_head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--sb-rule);
+    }
+
+    .o_owl_attr_picker_title {
+        font-family: var(--sb-font-display);
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--sb-walnut);
+        letter-spacing: 0.02em;
+    }
+
+    .o_owl_attr_picker_pill {
+        font-family: var(--sb-font-mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        padding: 3px 8px;
+        border-radius: 2px;
+        background: var(--sb-sky-l, #d8e3ec);
+        color: var(--sb-sky);
+        text-transform: uppercase;
+    }
+
+    .o_owl_attr_picker_saving {
+        background: var(--sb-walnut, #6b3f2a);
+        color: var(--sb-linen);
+    }
+
+    .o_owl_attr_picker_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+    }
+
+    .o_owl_attr_picker_field {
+        label {
+            display: block;
+            font-family: var(--sb-font-sans);
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--sb-ink-dim);
+            margin-bottom: 4px;
+        }
+    }
+
+    .o_owl_attr_select {
+        width: 100%;
+        padding: 8px 10px;
+        background: white;
+        border: 1px solid var(--sb-rule);
+        border-radius: 3px;
+        font-family: var(--sb-font-sans);
+        font-size: 13px;
+        color: var(--sb-ink);
+        cursor: pointer;
+        transition: border-color 150ms ease;
+
+        &:focus {
+            outline: none;
+            border-color: var(--sb-walnut);
+            box-shadow: 0 0 0 2px rgba(107, 63, 42, 0.12);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+
+    .o_owl_attr_picker_error {
+        margin: 12px 0 0;
+        padding: 8px 10px;
+        background: rgba(180, 60, 40, 0.08);
+        border: 1px solid rgba(180, 60, 40, 0.3);
+        border-radius: 3px;
+        font-size: 12px;
+        color: rgb(140, 40, 30);
+    }
+}

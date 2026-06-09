@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Portal page templates for the Southbrook Order Builder.
+
+  Track 2 commit 1 — scaffold (2026-05-30). Inherits Odoo's stock
+  portal layout (`portal.portal_layout`) and adds:
+
+    • A sidebar entry "Order Builder" under "My Account" so portal
+      users (dealers + customers) have a discoverable navigation
+      point.
+    • A page that renders the chrome (breadcrumb + page title +
+      sidebar) plus an empty `<div id="order_builder_root">` where
+      the OWL `<OrderBuilder/>` component will mount in commit 2.
+
+  Commit 2 will:
+    • Add the OWL JS / XML / SCSS bundle to the manifest assets.
+    • Replace the placeholder content of the mount-point div with
+      the initial OWL component render output (still mostly empty —
+      the OWL tree fills in across commits 5-13 per the charter
+      lineup).
+-->
+<odoo>
+
+    <!-- =================================================================
+         Sidebar entry: My Account → Order Builder
+         ================================================================= -->
+    <template
+        id="portal_my_home_southbrook_order_builder"
+        name="Portal: Southbrook Order Builder sidebar entry"
+        inherit_id="portal.portal_my_home"
+        customize_show="True">
+        <!-- G10 fix (2026-06-01): the previous portal_docs_entry call
+             rendered as a single small list row in the docs section,
+             effectively invisible. Replaced with a prominent card-
+             style entry at the TOP of the My Account page so a new
+             portal user (Sarah Johnson per the JTBD walkthrough)
+             sees "Start a new kitchen order" as the first thing on
+             her dashboard. -->
+        <xpath expr="//div[hasclass('o_portal_my_home')]" position="inside">
+            <div class="row g-2 mb-3 o_southbrook_portal_quick_start">
+                <div class="col-12">
+                    <a href="/my/southbrook/order-builder/new"
+                       class="card text-decoration-none o_southbrook_portal_cta">
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <span class="fa fa-cube fa-2x text-muted"/>
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1">
+                                    Design Your Kitchen
+                                </h5>
+                                <p class="card-text small text-muted mb-0">
+                                    Pick cabinets, configure dimensions,
+                                    request a quote.
+                                </p>
+                            </div>
+                            <span class="btn btn-primary">
+                                Start New Quote →
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </xpath>
+        <!-- Keep the original docs entry too so power users with many
+             orders can still see the standard "Your Orders" / "Your
+             Quotations" rows below the prominent CTA. -->
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Order Builder</t>
+                <t t-set="url">/my/southbrook/order-builder</t>
+                <t t-set="placeholder_count" t-value="0"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- =================================================================
+         Order Builder page
+         ================================================================= -->
+    <template
+        id="portal_order_builder"
+        name="Southbrook Order Builder Portal Page">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+            <t t-set="title">Southbrook Order Builder</t>
+
+            <!-- Breadcrumb -->
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a t-att-href="'/my'">My Account</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    Order Builder
+                </li>
+                <li class="breadcrumb-item active" t-if="order_id">
+                    <span t-esc="order_name"/>
+                </li>
+            </ol>
+
+            <!-- Header card with order info -->
+            <div class="o_southbrook_portal_header card mb-3">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-1">
+                        <t t-if="order">
+                            <span t-esc="order_name"/>
+                            <small class="text-muted ms-2">
+                                · <t t-esc="order.partner_id.name"/>
+                            </small>
+                        </t>
+                        <t t-else="">
+                            Order Builder
+                        </t>
+                    </h2>
+                    <p class="card-text text-muted mb-0" t-if="not order">
+                        Pick or create an order to configure your kitchen.
+                    </p>
+                    <p class="card-text text-muted mb-0" t-elif="order.state">
+                        Stage: <strong t-esc="dict(order._fields['state'].selection).get(order.state, order.state)"/>
+                    </p>
+                </div>
+            </div>
+
+            <!-- OWL mount point. Commit 2 mounts <OrderBuilder/> here.
+                 The placeholder text appears in commit-1 builds so it's
+                 obvious the route + frame work even before the JS bundle
+                 lands. -->
+            <div t-att-id="owl_mount_id"
+                 class="o_southbrook_owl_mount"
+                 t-att-data-order-id="order_id or ''"
+                 t-att-data-order-name="order_name"
+                 t-att-data-mode="order_mode or 'dealer'">
+                <div class="o_southbrook_owl_placeholder">
+                    <t t-if="not order">
+                        <!-- G9 fix (2026-06-01): self-service entry
+                             point — no more dead end on the no-id
+                             page. The button creates a draft order
+                             bound to the current portal user and
+                             redirects into the Order Builder. -->
+                        <strong>Start a new kitchen order</strong>
+                        <p>
+                            Configure your cabinets, see live pricing,
+                            and request a formal quote — all in one
+                            place.
+                        </p>
+                        <p>
+                            <a href="/my/southbrook/order-builder/new"
+                               class="btn btn-primary">
+                                Start New Quote →
+                            </a>
+                        </p>
+                    </t>
+                    <t t-else="">
+                        <strong>Order Builder — loading…</strong>
+                        <p>
+                            Order id <code t-esc="order_id"/> loaded for
+                            partner <strong t-esc="order.partner_id.name"/>.
+                            The OWL configurator mounts here.
+                        </p>
+                    </t>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

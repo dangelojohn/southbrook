@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  G1 + G2 (customer-flow JTBD gap analysis 2026-06-01) — public
+  Southbrook homepage.
+
+  Pre-fix: the website root rendered Odoo's default homepage — no
+  Southbrook branding, no value prop, no CTA, no path to the
+  configurator. A visitor like Sarah Johnson arriving at the site had
+  no idea what Southbrook does or how to begin.
+
+  Approach: inherit the stock `website.homepage` template (which the
+  Odoo website controller renders for /) and REPLACE its body with the
+  Southbrook hero + features + CTA strip. No new route, no controller
+  conflict — Odoo's default `/` handler renders this every time.
+
+  The 'Design Your Kitchen' CTA links to /my/southbrook/order-builder/new
+  unconditionally. The /my/... route requires auth, so Odoo auto-
+  redirects anonymous visitors to /web/login?redirect=/my/... then
+  back to the new-order route after sign-in. Single href, both
+  audiences.
+
+  All styling uses the shared design tokens (sb-walnut, sb-linen, etc.
+  on :root) per docs/CUSTOMER_TO_MANUFACTURING_FLOW.md §5.
+-->
+<odoo>
+
+  <template
+      id="southbrook_homepage"
+      name="Southbrook Homepage"
+      inherit_id="website.homepage">
+
+    <!-- Replace the entire body of website.homepage. The xpath targets
+         the outermost div of the stock template (Odoo 19 ships a
+         <div id="wrap"> in website.homepage, see addons/website/views/
+         website_templates.xml). We replace its children wholesale. -->
+    <xpath expr="//div[@id='wrap']" position="replace">
+      <div id="wrap" class="oe_structure oe_empty">
+        <main class="o_sb_home">
+
+          <!-- HERO -->
+          <section class="o_sb_hero">
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-7 o_sb_hero_text">
+                  <h1 class="o_sb_hero_title">
+                    Custom kitchen cabinets,<br/>
+                    <span class="o_sb_hero_accent">designed online.</span>
+                  </h1>
+                  <p class="o_sb_hero_sub">
+                    Configure cabinets, see live pricing, request a
+                    formal quote — all from your browser. No salesperson
+                    on the phone. No spreadsheet roundtrips.
+                  </p>
+                  <p class="o_sb_hero_cta_row">
+                    <a href="/my/southbrook/order-builder/new"
+                       class="o_sb_btn o_sb_btn_primary o_sb_btn_lg">
+                      Design Your Kitchen →
+                    </a>
+                    <a href="/web/login"
+                       class="o_sb_btn o_sb_btn_ghost o_sb_btn_lg">
+                      Sign In
+                    </a>
+                  </p>
+                  <p class="o_sb_hero_meta">
+                    Free to start. No credit card. Quote in minutes.
+                  </p>
+                </div>
+                <div class="col-lg-5 o_sb_hero_aside">
+                  <div class="o_sb_hero_card">
+                    <div class="o_sb_hero_card_label">FEATURED</div>
+                    <div class="o_sb_hero_card_title">
+                      Signature Series
+                    </div>
+                    <p class="o_sb_hero_card_body">
+                      Solid-wood frames, soft-close hardware, lifetime
+                      finish warranty. Configured to your dimensions
+                      and shipped flat-pack-ready.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- THREE-UP FEATURE BLOCKS -->
+          <section class="o_sb_features">
+            <div class="container">
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <div class="o_sb_feature">
+                    <span class="o_sb_feature_icon fa fa-cog"/>
+                    <h3 class="o_sb_feature_title">Configure</h3>
+                    <p class="o_sb_feature_body">
+                      Pick a cabinet family, set width / height / depth
+                      to the millimetre, choose door style + finish +
+                      hardware. Everything updates live.
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="o_sb_feature">
+                    <span class="o_sb_feature_icon fa fa-cubes"/>
+                    <h3 class="o_sb_feature_title">Visualize</h3>
+                    <p class="o_sb_feature_body">
+                      See your kitchen in 3D. Toggle between rendered
+                      cabinets and blueline architectural drawings
+                      with auto-dimensions.
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="o_sb_feature">
+                    <span class="o_sb_feature_icon fa fa-check-square-o"/>
+                    <h3 class="o_sb_feature_title">Order</h3>
+                    <p class="o_sb_feature_body">
+                      Request a formal quote with one click. We review
+                      your configuration, confirm pricing, and ship
+                      your kitchen — typically in 4-6 weeks.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECONDARY CTA STRIP -->
+          <section class="o_sb_cta_strip">
+            <div class="container">
+              <div class="row align-items-center">
+                <div class="col-lg-8">
+                  <h2 class="o_sb_cta_strip_title">
+                    Ready to design your kitchen?
+                  </h2>
+                  <p class="o_sb_cta_strip_sub">
+                    Start a draft project — no commitment, no salesperson.
+                  </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                  <a href="/my/southbrook/order-builder/new"
+                     class="o_sb_btn o_sb_btn_primary o_sb_btn_lg">
+                    Start Now →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </main>
+      </div>
+    </xpath>
+
+  </template>
+
+</odoo>

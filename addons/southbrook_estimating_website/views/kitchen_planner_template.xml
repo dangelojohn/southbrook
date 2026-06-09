@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Phase 2 commit 1 (2026-05-31) — /kitchen-planner scaffold template.
+
+  The CUSTOMER-facing one-page configurator per CLAUDE.md §2.1.
+  Three-pane layout per PRODBOARD_MANIFEST §8.1:
+    .o_kp_rail     — left  58 px tool rail
+    .o_kp_catalog  — centre 394 px catalog pane (296×94 tile grid)
+    .o_kp_viewport — right flex viewport (mount point for the
+                     OWL <KitchenPlanner/> component in commit 2+)
+
+  Inherits website.layout so the site theme, navigation, and CSS
+  variables (Sky/Walnut/Linen tokens from portal_root.scss) apply.
+
+  Commit 1 ships the visual skeleton + the mount-point div. Commit 2
+  adds the OWL bundle to the asset list and mounts <KitchenPlanner/>
+  into #kitchen_planner_root. Until then, the scaffold text appears
+  so it's obvious the route + frame work even before the JS lands.
+-->
+<odoo>
+
+  <template id="kitchen_planner_template" name="Southbrook Kitchen Planner">
+    <t t-call="website.layout">
+      <t t-set="additional_title">Design Your Kitchen</t>
+
+      <!-- Phase 2 commit 3 (2026-05-31): OWL now owns the entire
+           three-pane layout. The mount-point div replaces the
+           static rail/catalog/viewport markup; commit 1's scaffold
+           HTML moved into the <KitchenPlanner/> OWL template (and
+           the catalog pane now renders real tiles from product.template
+           via /southbrook/api/kitchen-planner/state). Until the OWL
+           bundle loads + mounts, the placeholder text below is what
+           renders. -->
+      <div t-att-id="owl_mount_id"
+           class="o_kp_owl_mount"
+           t-att-data-user-partner-id="user_partner.id"
+           t-att-data-user-partner-name="user_partner.name">
+        <div class="o_kp_root o_kp_boot_placeholder">
+          <aside class="o_kp_rail"/>
+          <section class="o_kp_catalog">
+            <header class="o_kp_catalog_header">
+              <h2 class="o_kp_catalog_title">Cabinets</h2>
+            </header>
+            <div class="o_kp_state o_kp_loading">Loading…</div>
+          </section>
+          <main class="o_kp_viewport">
+            <div class="o_kp_placeholder">
+              <h1 class="o_kp_placeholder_title">Design Your Kitchen</h1>
+              <p class="o_kp_placeholder_meta">Loading planner…</p>
+            </div>
+          </main>
+        </div>
+      </div>
+    </t>
+  </template>
+
+</odoo>
