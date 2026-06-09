@@ -1,151 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  G1 + G2 (customer-flow JTBD gap analysis 2026-06-01) — public
-  Southbrook homepage.
+  Southbrook Trade Portal — public landing (/).
 
-  Pre-fix: the website root rendered Odoo's default homepage — no
-  Southbrook branding, no value prop, no CTA, no path to the
-  configurator. A visitor like Sarah Johnson arriving at the site had
-  no idea what Southbrook does or how to begin.
+  2026-06-03 — replaces the prior consumer-marketing homepage (hero,
+  three-up feature blocks, CTA strip) with the same mobile-first
+  trade-portal shell rendered at /web/login.
 
-  Approach: inherit the stock `website.homepage` template (which the
-  Odoo website controller renders for /) and REPLACE its body with the
-  Southbrook hero + features + CTA strip. No new route, no controller
-  conflict — Odoo's default `/` handler renders this every time.
+  Rationale: this site is the access gate for approved contractors
+  and high-end designers, not a public marketing page. Visitors who
+  hit / should immediately see the portal entry — logo, brand,
+  "Log in" button, "Request access" fallback, portal area shortcuts —
+  not generic value-prop copy.
 
-  The 'Design Your Kitchen' CTA links to /my/southbrook/order-builder/new
-  unconditionally. The /my/... route requires auth, so Odoo auto-
-  redirects anonymous visitors to /web/login?redirect=/my/... then
-  back to the new-order route after sign-in. Single href, both
-  audiences.
+  Shares all styling with views/auth_template.xml via
+  static/src/scss/trade_portal.scss. The auth chrome embeds the
+  stock Odoo form at this exact spot; this homepage uses an explicit
+  "Log in" anchor to /web/login instead.
 
-  All styling uses the shared design tokens (sb-walnut, sb-linen, etc.
-  on :root) per docs/CUSTOMER_TO_MANUFACTURING_FLOW.md §5.
+  The public marketing chrome (navbar, footer, "Your Logo" placeholder,
+  fake company email/phone, About Us / Newsletter columns) injected
+  by website.layout is hidden via SCSS using `body:has(.o_sb_tp)` —
+  no second XML inherit, no body-class plumbing.
 -->
 <odoo>
 
   <template
       id="southbrook_homepage"
-      name="Southbrook Homepage"
+      name="Southbrook Trade Portal — Homepage"
       inherit_id="website.homepage">
 
-    <!-- Replace the entire body of website.homepage. The xpath targets
-         the outermost div of the stock template (Odoo 19 ships a
-         <div id="wrap"> in website.homepage, see addons/website/views/
-         website_templates.xml). We replace its children wholesale. -->
+    <!-- Replace the entire wrap. Odoo 19 ships
+         `<div id="wrap">…</div>` in website.homepage; we swap the
+         children for the trade-portal shell. -->
     <xpath expr="//div[@id='wrap']" position="replace">
       <div id="wrap" class="oe_structure oe_empty">
-        <main class="o_sb_home">
+        <div class="o_sb_tp">
+          <div class="o_sb_tp_shell">
 
-          <!-- HERO -->
-          <section class="o_sb_hero">
-            <div class="container">
-              <div class="row">
-                <div class="col-lg-7 o_sb_hero_text">
-                  <h1 class="o_sb_hero_title">
-                    Custom kitchen cabinets,<br/>
-                    <span class="o_sb_hero_accent">designed online.</span>
-                  </h1>
-                  <p class="o_sb_hero_sub">
-                    Configure cabinets, see live pricing, request a
-                    formal quote — all from your browser. No salesperson
-                    on the phone. No spreadsheet roundtrips.
-                  </p>
-                  <p class="o_sb_hero_cta_row">
-                    <a href="/my/southbrook/order-builder/new"
-                       class="o_sb_btn o_sb_btn_primary o_sb_btn_lg">
-                      Design Your Kitchen →
-                    </a>
-                    <a href="/web/login"
-                       class="o_sb_btn o_sb_btn_ghost o_sb_btn_lg">
-                      Sign In
-                    </a>
-                  </p>
-                  <p class="o_sb_hero_meta">
-                    Free to start. No credit card. Quote in minutes.
-                  </p>
-                </div>
-                <div class="col-lg-5 o_sb_hero_aside">
-                  <div class="o_sb_hero_card">
-                    <div class="o_sb_hero_card_label">FEATURED</div>
-                    <div class="o_sb_hero_card_title">
-                      Signature Series
-                    </div>
-                    <p class="o_sb_hero_card_body">
-                      Solid-wood frames, soft-close hardware, lifetime
-                      finish warranty. Configured to your dimensions
-                      and shipped flat-pack-ready.
-                    </p>
-                  </div>
-                </div>
+            <!-- Logo -->
+            <div class="o_sb_tp_logo_row">
+              <a href="/" aria-label="Southbrook Cabinetry">
+                <img class="o_sb_tp_logo"
+                     src="/southbrook_estimating_website/static/src/img/southbrook_logo.png"
+                     alt="Southbrook Cabinetry"/>
+              </a>
+            </div>
+
+            <!-- Primary card: brand copy + Log in / Request access -->
+            <div class="o_sb_tp_card">
+              <p class="o_sb_tp_eyebrow">Approved access</p>
+              <h1 class="o_sb_tp_title">Trade Portal</h1>
+              <p class="o_sb_tp_body">
+                Log in to view active cabinet projects, quote status,
+                drawings, and revisions.
+              </p>
+
+              <!-- Resolve Request-access target: signup if uninvited
+                   signup is enabled, otherwise the contact page. -->
+              <t t-set="_inv_scope"
+                 t-value="request.env['ir.config_parameter'].sudo().get_param('auth_signup.invitation_scope', 'b2b')"/>
+              <t t-set="_request_access_url"
+                 t-value="'/web/signup' if _inv_scope == 'b2c' else '/contactus'"/>
+
+              <div class="o_sb_tp_actions">
+                <a href="/web/login"
+                   class="o_sb_tp_btn o_sb_tp_btn_primary">
+                  Log in
+                </a>
+                <a t-att-href="_request_access_url"
+                   class="o_sb_tp_btn o_sb_tp_btn_secondary">
+                  Request access
+                </a>
               </div>
             </div>
-          </section>
 
-          <!-- THREE-UP FEATURE BLOCKS -->
-          <section class="o_sb_features">
-            <div class="container">
-              <div class="row g-4">
-                <div class="col-md-4">
-                  <div class="o_sb_feature">
-                    <span class="o_sb_feature_icon fa fa-cog"/>
-                    <h3 class="o_sb_feature_title">Configure</h3>
-                    <p class="o_sb_feature_body">
-                      Pick a cabinet family, set width / height / depth
-                      to the millimetre, choose door style + finish +
-                      hardware. Everything updates live.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="o_sb_feature">
-                    <span class="o_sb_feature_icon fa fa-cubes"/>
-                    <h3 class="o_sb_feature_title">Visualize</h3>
-                    <p class="o_sb_feature_body">
-                      See your kitchen in 3D. Toggle between rendered
-                      cabinets and blueline architectural drawings
-                      with auto-dimensions.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="o_sb_feature">
-                    <span class="o_sb_feature_icon fa fa-check-square-o"/>
-                    <h3 class="o_sb_feature_title">Order</h3>
-                    <p class="o_sb_feature_body">
-                      Request a formal quote with one click. We review
-                      your configuration, confirm pricing, and ship
-                      your kitchen — typically in 4-6 weeks.
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <!-- Compact tap-targets — anonymous taps land at login. -->
+            <div class="o_sb_tp_tiles">
+              <a href="/web/login?redirect=%2Fmy%2Fquotes"
+                 class="o_sb_tp_tile">
+                <svg class="o_sb_tp_tile_icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                  <path d="M6 3h9l5 5v13H6z"/>
+                  <path d="M14 3v6h6"/>
+                  <path d="M9 14h7M9 17h5"/>
+                </svg>
+                <span>Quotes</span>
+              </a>
+              <a href="/web/login?redirect=%2Fmy%2Fprojects"
+                 class="o_sb_tp_tile">
+                <svg class="o_sb_tp_tile_icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                  <path d="M3 7h6l2 2h10v11H3z"/>
+                </svg>
+                <span>Projects</span>
+              </a>
+              <a href="/web/login?redirect=%2Fmy%2Fdrawings"
+                 class="o_sb_tp_tile">
+                <svg class="o_sb_tp_tile_icon" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="1.7"
+                     stroke-linecap="round" stroke-linejoin="round"
+                     aria-hidden="true">
+                  <path d="M4 4h12l4 4v12H4z"/>
+                  <path d="M8 12h8M8 16h5"/>
+                </svg>
+                <span>Drawings</span>
+              </a>
             </div>
-          </section>
 
-          <!-- SECONDARY CTA STRIP -->
-          <section class="o_sb_cta_strip">
-            <div class="container">
-              <div class="row align-items-center">
-                <div class="col-lg-8">
-                  <h2 class="o_sb_cta_strip_title">
-                    Ready to design your kitchen?
-                  </h2>
-                  <p class="o_sb_cta_strip_sub">
-                    Start a draft project — no commitment, no salesperson.
-                  </p>
-                </div>
-                <div class="col-lg-4 text-lg-end">
-                  <a href="/my/southbrook/order-builder/new"
-                     class="o_sb_btn o_sb_btn_primary o_sb_btn_lg">
-                    Start Now →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </section>
+            <!-- Trust / status pills -->
+            <ul class="o_sb_tp_trust">
+              <li>Odoo backed</li>
+              <li>Secure login</li>
+              <li>For contractors and design partners</li>
+              <li>Mobile ready</li>
+            </ul>
 
-        </main>
+            <!-- Footer help -->
+            <p class="o_sb_tp_help">
+              Need help with your login?
+              <a href="/contactus">Contact Southbrook</a>
+            </p>
+
+          </div>
+        </div>
       </div>
     </xpath>
 

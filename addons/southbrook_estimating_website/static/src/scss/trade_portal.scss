@@ -1,0 +1,406 @@
+// =====================================================================
+// Southbrook Trade Portal — mobile-first auth + landing chrome.
+//
+// 2026-06-03 — replaces the marketing-oriented homepage hero and the
+// walnut/linen two-column login chrome with a private trade-portal
+// shell sized for phones first.
+//
+// Target users: approved contractors and high-end designers granted
+// access from the Odoo backend. The shell reads as a private login
+// gate, NOT a sales website.
+//
+// Palette (canonical, from the approved mock):
+//   #7bc3e2  Southbrook blue       (primary, brand mark)
+//   #5e4e36  Brown / taupe         (brand mark, secondary accent)
+//   #303030  Charcoal              (body text)
+//   #818181  Muted grey            (supporting text)
+//   #f6f6f6  Light grey            (page surface)
+//   #e7e7e7  Subtle rule           (borders + dividers)
+//   #ffffff  White                 (card surface)
+//
+// Tap targets are at least 56px tall everywhere a finger lands.
+// =====================================================================
+
+:root {
+  // Trade portal tokens — separate namespace from the legacy walnut/linen
+  // tokens on the SAME :root so they coexist with /kitchen-planner and
+  // /my/southbrook/order-builder until those routes are restyled.
+  --sb-tp-blue:        #7bc3e2;
+  --sb-tp-blue-d:      #5fa9c8;
+  --sb-tp-taupe:       #5e4e36;
+  --sb-tp-taupe-d:     #4a3c28;
+  --sb-tp-ink:         #303030;
+  --sb-tp-mute:        #818181;
+  --sb-tp-surface:     #ffffff;
+  --sb-tp-bg:          #f6f6f6;
+  --sb-tp-rule:        #e7e7e7;
+  --sb-tp-rule-soft:   #f0f0f0;
+
+  --sb-tp-font:        'Inter', system-ui, -apple-system, 'Segoe UI',
+                       Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --sb-tp-radius:      10px;
+  --sb-tp-radius-sm:   6px;
+  --sb-tp-tap:         56px;
+  --sb-tp-card-pad:    28px;
+}
+
+// ---------------------------------------------------------------------
+// Shell. .o_sb_tp is rendered by both /web/login (inside login_layout's
+// t-out="0" replacement) and / (replacing the website.homepage body).
+// ---------------------------------------------------------------------
+.o_sb_tp {
+  font-family: var(--sb-tp-font);
+  color: var(--sb-tp-ink);
+  background: var(--sb-tp-bg);
+  min-height: 100vh;
+  padding: 24px 16px 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+
+  *, *::before, *::after { box-sizing: border-box; }
+}
+
+.o_sb_tp_shell {
+  width: 100%;
+  max-width: 420px;       // phone-shaped on desktop too
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// ---------------------------------------------------------------------
+// Logo block
+// ---------------------------------------------------------------------
+.o_sb_tp_logo_row {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+
+.o_sb_tp_logo {
+  display: block;
+  height: 36px;
+  width: auto;
+  max-width: 70%;
+}
+
+// ---------------------------------------------------------------------
+// Card — single-column, subtle borders, generous spacing.
+// ---------------------------------------------------------------------
+.o_sb_tp_card {
+  background: var(--sb-tp-surface);
+  border: 1px solid var(--sb-tp-rule);
+  border-radius: var(--sb-tp-radius);
+  padding: var(--sb-tp-card-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.o_sb_tp_eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sb-tp-taupe);
+  font-weight: 600;
+  margin: 0;
+}
+
+.o_sb_tp_title {
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 600;
+  color: var(--sb-tp-ink);
+  margin: -8px 0 0;
+  letter-spacing: -0.01em;
+}
+
+.o_sb_tp_body {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--sb-tp-mute);
+  margin: 0;
+}
+
+// ---------------------------------------------------------------------
+// Buttons. Both block-level on mobile; same on desktop because the
+// shell is a phone-shaped column.
+// ---------------------------------------------------------------------
+.o_sb_tp_actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.o_sb_tp_btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--sb-tp-tap);
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--sb-tp-radius);
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--sb-tp-blue-d);
+    outline-offset: 2px;
+  }
+}
+
+.o_sb_tp_btn_primary {
+  background: var(--sb-tp-blue);
+  color: #ffffff;
+  border-color: var(--sb-tp-blue);
+
+  &:hover, &:focus { background: var(--sb-tp-blue-d); border-color: var(--sb-tp-blue-d); color: #ffffff; }
+}
+
+.o_sb_tp_btn_secondary {
+  background: var(--sb-tp-surface);
+  color: var(--sb-tp-taupe);
+  border-color: var(--sb-tp-rule);
+
+  &:hover, &:focus { color: var(--sb-tp-taupe-d); border-color: var(--sb-tp-taupe); background: var(--sb-tp-surface); }
+}
+
+// ---------------------------------------------------------------------
+// Compact tap-targets row (Quotes / Projects / Drawings)
+// Three equal columns. Each tile is its own large tap target.
+// ---------------------------------------------------------------------
+.o_sb_tp_tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.o_sb_tp_tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--sb-tp-tap);
+  padding: 12px 8px;
+  background: var(--sb-tp-bg);
+  border: 1px solid var(--sb-tp-rule);
+  border-radius: var(--sb-tp-radius-sm);
+  color: var(--sb-tp-ink);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+
+  &:hover, &:focus {
+    border-color: var(--sb-tp-blue);
+    color: var(--sb-tp-ink);
+    background: var(--sb-tp-surface);
+  }
+}
+
+.o_sb_tp_tile_icon {
+  width: 18px;
+  height: 18px;
+  color: var(--sb-tp-taupe);
+}
+
+// ---------------------------------------------------------------------
+// Trust / status row — pill-shaped, small, muted.
+// ---------------------------------------------------------------------
+.o_sb_tp_trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.o_sb_tp_trust li {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--sb-tp-mute);
+  background: var(--sb-tp-bg);
+  border: 1px solid var(--sb-tp-rule);
+  padding: 6px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sb-tp-blue);
+    display: inline-block;
+  }
+}
+
+// ---------------------------------------------------------------------
+// Footer help text
+// ---------------------------------------------------------------------
+.o_sb_tp_help {
+  font-size: 13px;
+  color: var(--sb-tp-mute);
+  text-align: center;
+  margin: 8px 0 0;
+
+  a {
+    color: var(--sb-tp-taupe);
+    text-decoration: none;
+    border-bottom: 1px solid var(--sb-tp-rule);
+
+    &:hover { color: var(--sb-tp-taupe-d); border-bottom-color: var(--sb-tp-taupe); }
+  }
+}
+
+// ---------------------------------------------------------------------
+// Odoo login / signup / reset form — restyled to match the card.
+// The form arrives via `<t t-out="0"/>` from web.login_layout, so we
+// scope all overrides under .o_sb_tp_card to avoid bleeding into the
+// backend /web/login layout (which never wraps in .o_sb_tp).
+// ---------------------------------------------------------------------
+.o_sb_tp_form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+}
+
+.o_sb_tp_card {
+
+  // Odoo emits the bare form when t-out="0" expands. Match it loosely.
+  form,
+  .oe_login_form,
+  .oe_signup_form,
+  .oe_reset_password_form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+  }
+
+  .form-control {
+    min-height: var(--sb-tp-tap);
+    padding: 14px 16px;
+    font-size: 16px;     // >=16px stops iOS zoom-on-focus
+    border-radius: var(--sb-tp-radius-sm);
+    border: 1px solid var(--sb-tp-rule);
+    background: var(--sb-tp-surface);
+    color: var(--sb-tp-ink);
+    box-shadow: none;
+
+    &:focus {
+      border-color: var(--sb-tp-blue);
+      box-shadow: 0 0 0 3px rgba(123, 195, 226, 0.22);
+      outline: none;
+    }
+  }
+
+  label, .form-label, .col-form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sb-tp-ink);
+    margin: 0 0 4px;
+  }
+
+  // Stock Odoo primary button → trade-portal primary style
+  .btn-primary {
+    background: var(--sb-tp-blue);
+    border-color: var(--sb-tp-blue);
+    color: #ffffff;
+    min-height: var(--sb-tp-tap);
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--sb-tp-radius);
+    width: 100%;
+
+    &:hover, &:focus, &:active {
+      background: var(--sb-tp-blue-d);
+      border-color: var(--sb-tp-blue-d);
+      color: #ffffff;
+      box-shadow: none;
+    }
+  }
+
+  // Secondary / outline buttons inside the form (e.g. "Reset Password")
+  .btn-secondary,
+  .btn-link,
+  a.btn-link {
+    color: var(--sb-tp-taupe);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  // Odoo's "Remember me" + "Reset password" footer row
+  .o_login_auth,
+  .form-check,
+  .text-center {
+    font-size: 13px;
+    color: var(--sb-tp-mute);
+    a { color: var(--sb-tp-taupe); text-decoration: none; }
+    a:hover { color: var(--sb-tp-taupe-d); text-decoration: underline; }
+  }
+
+  .text-danger,
+  .alert-danger {
+    color: #a83a2b;
+    background: #fbeae7;
+    border: 1px solid #f1c3bd;
+    border-radius: var(--sb-tp-radius-sm);
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}
+
+// ---------------------------------------------------------------------
+// Hide marketing / placeholder chrome on every page that renders the
+// trade-portal shell. website.layout (inherited by website.homepage,
+// web.login_layout > the website override, and most public pages)
+// injects a navbar, "Your Logo" placeholder, fake company email/phone,
+// and a 4-column About/Products/Newsletter/Follow-us footer. None of
+// that belongs on a private trade portal. We hide the whole thing only
+// when the .o_sb_tp shell is on the page — `body:has()` is supported
+// across every browser the portal targets (Safari 15.4+, Chrome 105+,
+// Firefox 121+, all iOS/Android current).
+// ---------------------------------------------------------------------
+body:has(.o_sb_tp) {
+  background: var(--sb-tp-bg);
+  margin: 0;
+  padding: 0;
+
+  > header,
+  header#top,
+  header.o_header_standard,
+  .o_main_navbar,
+  #wrapwrap > header,
+  #wrapwrap > footer,
+  footer#footer,
+  .o_footer,
+  .o_footer_copyright {
+    display: none !important;
+  }
+
+  // Stock #wrapwrap normally clips with min-height: 100vh and a flex
+  // column. Reset so the shell drives its own layout.
+  #wrapwrap, #wrap, main {
+    background: var(--sb-tp-bg);
+    padding: 0;
+    min-height: auto;
+  }
+}

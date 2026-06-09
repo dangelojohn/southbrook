@@ -27,10 +27,15 @@
         "views/portal_template.xml",
         # Phase 2 commit 1 — /kitchen-planner customer route + template.
         "views/kitchen_planner_template.xml",
-        # G1 + G2 (2026-06-01) — public Southbrook homepage at /.
+        # 2026-06-03 — Southbrook Trade Portal landing at /.
+        # Replaces the prior consumer-marketing hero with the
+        # mobile-first private trade portal shell.
         "views/homepage_template.xml",
-        # G4 + G5 + G6 + G8 (2026-06-01) — branded auth pages
-        # (login/signup chrome) + project-name field on signup.
+        # 2026-06-03 — Trade Portal auth chrome for /web/login,
+        # /web/signup, /web/reset_password. Mobile-first single
+        # column; embeds the stock Odoo form inside the shell via
+        # web.login_layout's t-out="0" hook (form semantics
+        # preserved, CSRF + redirect + signup behavior intact).
         "views/auth_template.xml",
         # 2026-06-02 — fix 500 on /shop/<slug> caused by upstream
         # OCA website_product_configurator chaining .currency_id on a
@@ -58,7 +63,19 @@
             "southbrook_estimating/static/lib/three/three.min.js",
             "southbrook_estimating/static/lib/three/OrbitControls.js",
             "southbrook_estimating_website/static/src/scss/portal_root.scss",
-            # G1 + G2 (2026-06-01) — homepage hero + features SCSS.
+            # 2026-06-03 — mobile-first Trade Portal shell SCSS
+            # (palette, tap targets, card/tile layout). Styles the
+            # /web/login / /web/signup / /web/reset_password chrome
+            # AND the public / landing page, sharing one stylesheet.
+            # Loaded BEFORE homepage.scss so portal styles win on
+            # routes the legacy homepage.scss also touches.
+            "southbrook_estimating_website/static/src/scss/trade_portal.scss",
+            # Legacy homepage hero + features SCSS — kept loaded
+            # because portal_root.scss-era classes (.o_sb_btn, etc.)
+            # are still referenced from /kitchen-planner and
+            # /my/southbrook/order-builder. The 2026-06-03 trade-
+            # portal redesign hides every .o_sb_hero/.o_sb_features/
+            # .o_sb_cta_strip element by not emitting it.
             "southbrook_estimating_website/static/src/scss/homepage.scss",
             # Phase 2 commit 1 — kitchen-planner three-pane SCSS.
             # Loads AFTER portal_root.scss so the :root tokens defined
