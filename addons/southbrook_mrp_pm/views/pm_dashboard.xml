@@ -30,14 +30,22 @@
           <templates>
             <t t-name="card">
               <div class="o_sb_pm_dash_card oe_kanban_global_click">
-                <header class="o_sb_pm_dash_card_h">
+                <!-- NB: must be <div>, not <header>. Odoo 19's Kanban
+                     arch parser treats <header> as a view-level header-
+                     button container and STOPS descending into its
+                     children, so any <field> inside <header> never gets
+                     a field_id assigned. The compiled card template then
+                     references archInfo.fieldNodes['<name>_1'] which is
+                     undefined, and KanbanRecord.getFormattedValue throws
+                     "Cannot destructure property 'name'". -->
+                <div class="o_sb_pm_dash_card_h">
                   <span class="o_sb_pm_dash_code">
                     <field name="code"/>
                   </span>
                   <span class="o_sb_pm_dash_name">
                     <field name="name"/>
                   </span>
-                </header>
+                </div>
                 <div class="o_sb_pm_dash_metrics">
                   <div class="o_sb_pm_dash_metric o_sb_pm_dash_inflight">
                     <div class="o_sb_pm_dash_label">In Queue</div>
@@ -119,14 +127,16 @@
           <templates>
             <t t-name="card">
               <div class="o_sb_pm_dash_card oe_kanban_global_click">
-                <header class="o_sb_pm_dash_card_h">
+                <!-- Must be <div>, not <header>. See the comment on the
+                     PM workcenter Kanban above. -->
+                <div class="o_sb_pm_dash_card_h">
                   <span class="o_sb_pm_dash_code">
                     <field name="code"/>
                   </span>
                   <span class="o_sb_pm_dash_name">
                     <field name="name"/>
                   </span>
-                </header>
+                </div>
                 <div class="o_sb_pm_dash_metrics">
                   <div class="o_sb_pm_dash_metric o_sb_pm_dash_inflight">
                     <div class="o_sb_pm_dash_label">In Flight</div>
